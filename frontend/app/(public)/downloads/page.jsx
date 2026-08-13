@@ -21,7 +21,7 @@ export default async function Page() {
 
   return (
     <>
-      <PageHero eyebrow="Resources" title="Downloads" description="Official documents and forms." image="/about-volunteers-india.png" />
+      <PageHero pageKey="downloads" eyebrow="Resources" title="Downloads" description="Official documents and forms." image="/about-volunteers-india.png" />
       <div className="mx-auto max-w-3xl px-4 py-12 md:py-16">
         {downloads.length > 0 ? (
           <div className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-soft">

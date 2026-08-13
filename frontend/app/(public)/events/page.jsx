@@ -25,7 +25,7 @@ export default function Page() {
 
   return (
     <>
-      <PageHero eyebrow="Events" title="Upcoming Events" description="Camps and drives." image="/community-health-camp-india.png" />
+      <PageHero pageKey="events" eyebrow="Events" title="Upcoming Events" description="Camps and drives." image="/community-health-camp-india.png" />
       {loading ? (
         <div className="flex justify-center py-20">
           <Loader2 className="size-10 animate-spin text-navy/50" />

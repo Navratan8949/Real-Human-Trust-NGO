@@ -21,7 +21,7 @@ export default async function Page() {
 
   return (
     <>
-      <PageHero 
+      <PageHero pageKey="crowdfunding" 
         eyebrow="Crowdfunding" 
         title="Support Campaigns" 
         description="Transparent targets." 

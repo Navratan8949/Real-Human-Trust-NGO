@@ -88,7 +88,7 @@ function VolunteerForm() {
 export default function VolunteerPage() {
   return (
     <>
-      <PageHero eyebrow="Get Involved" title="Become a Volunteer" description="Join our mission to bring a positive change in the society." image="/community-health-camp-india.png" />
+      <PageHero pageKey="volunteer" eyebrow="Get Involved" title="Become a Volunteer" description="Join our mission to bring a positive change in the society." image="/community-health-camp-india.png" />
       <div className="mx-auto max-w-3xl px-4 py-20">
         <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="size-8 animate-spin text-navy" /></div>}>
           <VolunteerForm />

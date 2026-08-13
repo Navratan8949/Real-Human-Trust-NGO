@@ -35,7 +35,7 @@ export default async function Page({ params }) {
 
   return (
     <>
-      <PageHero 
+      <PageHero pageKey={type === "annual" ? "reports_annual" : "reports_audit"} 
         eyebrow="Transparency & Accountability" 
         title={title} 
         description={description} 

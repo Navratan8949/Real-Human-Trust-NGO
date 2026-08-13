@@ -67,7 +67,7 @@ export default function Page() {
 
   return (
     <>
-      <PageHero
+      <PageHero pageKey="vision_mission"
         eyebrow="Vision & Mission"
         title="A fair chance to learn, grow and live with dignity."
         description="Our guiding principles for education, health, livelihood and public welfare."

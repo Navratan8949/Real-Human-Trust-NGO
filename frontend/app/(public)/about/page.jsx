@@ -40,7 +40,7 @@ export default function Page() {
 
   return (
     <>
-      <PageHero
+      <PageHero pageKey="about"
         eyebrow="About Us"
         title="Real work for education, dignity and community care."
         description="A Rajkot-based charitable trust serving children and families through actionable, on-the-ground welfare programs."

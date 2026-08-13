@@ -55,7 +55,7 @@ const objectives = [
 export default function Page() {
   return (
     <>
-      <PageHero
+      <PageHero pageKey="objectives"
         eyebrow="Our Objectives"
         title="Clear goals for measurable impact."
         description="We focus on targeted, structural interventions that families can feel immediately."

@@ -23,7 +23,7 @@ export default function Page() {
 
   return (
     <>
-      <PageHero
+      <PageHero pageKey="team"
         eyebrow="Our Leadership"
         title="Management Team"
         description="Meet the dedicated individuals who steer Real Human Education & Charitable Trust towards its vision with unwavering commitment."

@@ -68,7 +68,7 @@ export function ProjectsClientPage({ initialProjects = [] }) {
 
   return (
     <>
-      <PageHero
+      <PageHero pageKey="projects"
         eyebrow="Our Work"
         title="Our Projects"
         description="Ongoing, upcoming, and completed initiatives creating real impact across Gujarat."

@@ -6,7 +6,7 @@ export const metadata = { title: "Founder's Message" }
 export default function Page() {
   return (
     <>
-      <PageHero
+      <PageHero pageKey="founder_message"
         eyebrow="Founder's Message"
         title="Service should feel personal and dependable."
         description="Education and dignity as foundations for change."

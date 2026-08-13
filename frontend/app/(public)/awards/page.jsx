@@ -23,7 +23,7 @@ export default function Page() {
 
   return (
     <main className="bg-background">
-      <PageHero 
+      <PageHero pageKey="awards" 
         eyebrow="Awards" 
         title="Awards & Certificates" 
         description="Recognition for our relentless dedication to community welfare and rural empowerment." 

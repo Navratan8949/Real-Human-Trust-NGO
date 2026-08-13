@@ -75,7 +75,7 @@ export default async function Page() {
 
   return (
     <>
-      <PageHero
+      <PageHero pageKey="testimonials"
         eyebrow="Testimonials"
         title="Voices from Our Community"
         description="Stories of hope, impact, and transformation shared by our beneficiaries, volunteers, and supporters."

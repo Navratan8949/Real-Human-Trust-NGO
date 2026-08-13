@@ -52,6 +52,24 @@ export default function SiteContentAdminPage() {
   const [emailConfig, setEmailConfig] = useState({
     service: "", host: "", port: "", secure: false, user: "", pass: "", fromEmail: "", fromName: ""
   })
+  const [pageHeroes, setPageHeroes] = useState({})
+
+  const PAGE_HERO_KEYS = [
+    { key: "about", label: "About Us" },
+    { key: "events", label: "Events" },
+    { key: "volunteer", label: "Volunteer" },
+    { key: "projects", label: "Projects" },
+    { key: "crowdfunding", label: "Crowdfunding" },
+    { key: "downloads", label: "Downloads" },
+    { key: "awards", label: "Awards" },
+    { key: "team", label: "Management Team" },
+    { key: "founder_message", label: "Founder's Message" },
+    { key: "objectives", label: "Objectives" },
+    { key: "vision_mission", label: "Vision & Mission" },
+    { key: "testimonials", label: "Testimonials" },
+    { key: "reports_annual", label: "Annual Reports" },
+    { key: "reports_audit", label: "Audit Reports" }
+  ]
 
   useEffect(() => {
     dispatch(fetchSiteContent())
@@ -159,6 +177,11 @@ export default function SiteContentAdminPage() {
       if (siteContent.email_config?.content) {
         try { setEmailConfig(JSON.parse(siteContent.email_config.content)) } catch (e) { }
       }
+
+      // 17. Page Heroes
+      if (siteContent.page_heroes?.content) {
+        try { setPageHeroes(JSON.parse(siteContent.page_heroes.content)) } catch (e) { }
+      }
     }
   }, [siteContent])
 
@@ -238,6 +261,7 @@ export default function SiteContentAdminPage() {
           <TabsTrigger value="site_logo">Site Logo</TabsTrigger>
           <TabsTrigger value="ngo_certificates">NGO Certificates</TabsTrigger>
           <TabsTrigger value="email_config">Email Settings</TabsTrigger>
+          <TabsTrigger value="page_heroes">Page Heroes</TabsTrigger>
         </TabsList>
 
         {/* FOUNDER MESSAGE TAB */}
@@ -691,6 +715,40 @@ export default function SiteContentAdminPage() {
                 setIsSaving(false)
               }} disabled={isSaving}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <><Save className="mr-2 h-4 w-4" /> Save Logo</>}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* PAGE HEROES TAB */}
+        <TabsContent value="page_heroes">
+          <Card>
+            <CardHeader><CardTitle>Page Hero Banners</CardTitle></CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-sm text-muted-foreground mb-4">Edit the title, description and image for the top sections of each page.</div>
+              {PAGE_HERO_KEYS.map(({ key, label }) => {
+                const hero = pageHeroes[key] || { eyebrow: "", title: "", description: "", image: "" }
+                return (
+                  <div key={key} className="p-4 border rounded-xl space-y-4 bg-muted/20">
+                    <h4 className="font-semibold text-accent">{label} Page</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><label className="text-xs font-semibold block mb-1">Eyebrow / Tag</label><Input value={hero.eyebrow} onChange={(e) => setPageHeroes({ ...pageHeroes, [key]: { ...hero, eyebrow: e.target.value } })} placeholder="e.g. About Us" /></div>
+                      <div><label className="text-xs font-semibold block mb-1">Title</label><Input value={hero.title} onChange={(e) => setPageHeroes({ ...pageHeroes, [key]: { ...hero, title: e.target.value } })} placeholder="e.g. Real work for education" /></div>
+                    </div>
+                    <div><label className="text-xs font-semibold block mb-1">Description</label><Textarea value={hero.description} onChange={(e) => setPageHeroes({ ...pageHeroes, [key]: { ...hero, description: e.target.value } })} placeholder="Brief description..." /></div>
+                    <div>
+                      <label className="text-xs font-semibold block mb-1">Hero Image</label>
+                      <div className="flex gap-2 items-center mt-1">
+                        {hero.image && <Image src={hero.image} width={60} height={40} className="rounded object-cover h-10 w-16 shrink-0 border" alt="preview" />}
+                        <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setPageHeroes({ ...pageHeroes, [key]: { ...hero, image: url } }), `hero_img_${key}`)} />
+                        {uploadingImage === `hero_img_${key}` && <Loader2 className="animate-spin h-4 w-4 shrink-0 text-accent" />}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+              <Button onClick={() => saveContent("page_heroes", "Page Heroes", pageHeroes)} disabled={isSaving}>
+                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Save Page Heroes
               </Button>
             </CardContent>
           </Card>
