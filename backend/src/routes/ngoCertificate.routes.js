@@ -9,6 +9,7 @@ const {
     createNGOCertificate,
     updateNGOCertificate,
     deleteNGOCertificate,
+    previewNGOCertificate,
 } = require("../controllers/ngoCertificate.controller");
 
 // Public
