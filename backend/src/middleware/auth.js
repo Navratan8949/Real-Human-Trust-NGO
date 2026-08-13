@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { User } = require("../models");
+const { User, Volunteer } = require("../models");
 
 const isAuthenticated = async (req, res, next) => {
     try {
@@ -14,9 +14,16 @@ const isAuthenticated = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret123');
 
-        const user = await User.findByPk(decoded.id, {
-            attributes: { exclude: ["password"] },
-        });
+        let user;
+        if (decoded.role === "volunteer") {
+            user = await Volunteer.findByPk(decoded.id, {
+                attributes: { exclude: ["password"] },
+            });
+        } else {
+            user = await User.findByPk(decoded.id, {
+                attributes: { exclude: ["password"] },
+            });
+        }
 
         if (!user) {
             return res.status(404).json({
@@ -25,14 +32,22 @@ const isAuthenticated = async (req, res, next) => {
             });
         }
 
-        if (!user.isActive) {
+        if (decoded.role !== "volunteer" && !user.isActive) {
             return res.status(403).json({
                 success: false,
                 message: "Your account has been deactivated.",
             });
         }
+        
+        if (decoded.role === "volunteer" && user.status !== "approved") {
+            return res.status(403).json({
+                success: false,
+                message: "Your application is not approved.",
+            });
+        }
 
         req.user = user;
+        req.user.role = decoded.role || user.role;
 
         next();
     } catch (error) {

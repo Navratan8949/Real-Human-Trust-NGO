@@ -1,15 +1,25 @@
 import { QRCodeSVG } from "qrcode.react"
 
-export function IdCard({ member, user, verificationUrl }) {
-  if (!member || !user) return null
+export function IdCard({ member, user, volunteer, verificationUrl }) {
+  if (!member && !volunteer) return null
 
+  const isVolunteer = !!volunteer
+  const profileImage = isVolunteer ? volunteer.profileImage?.url : (member?.profileImage?.url || user?.profileImage?.url)
+  const fullName = isVolunteer ? volunteer.fullName : user?.fullName
+  const initial = fullName?.[0] || "?"
+  const idNumber = isVolunteer ? volunteer.volunteerId : member?.memberId
+  const bloodGroup = isVolunteer ? volunteer.bloodGroup : member?.bloodGroup
+  const typeLabel = isVolunteer ? "Volunteer" : member?.membershipType
+  
   return (
     <div className="flex justify-center w-full">
       <div id="id-card" className="relative w-full max-w-[380px] overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-border/60">
         {/* Card Header */}
-        <div className="bg-navy p-4 text-center text-white">
+        <div className={`p-4 text-center text-white ${isVolunteer ? "bg-emerald-600" : "bg-navy"}`}>
           <h2 className="font-serif text-base font-bold tracking-tight">REAL HUMAN EDUCATION & CHARITABLE TRUST</h2>
-          <p className="text-[9px] uppercase tracking-widest text-accent mt-0.5">Govt. Regd. NGO</p>
+          <p className={`text-[9px] uppercase tracking-widest mt-0.5 ${isVolunteer ? "text-emerald-100" : "text-accent"}`}>
+            Govt. Regd. NGO
+          </p>
         </div>
 
         {/* Card Body */}
@@ -17,11 +27,11 @@ export function IdCard({ member, user, verificationUrl }) {
           <div className="flex items-start gap-4">
             {/* Profile Image */}
             <div className="size-20 shrink-0 overflow-hidden rounded-xl border border-border bg-secondary">
-              {member.profileImage?.url || user.profileImage?.url ? (
-                <img src={member.profileImage?.url || user.profileImage?.url} alt="Profile" className="h-full w-full object-cover" />
+              {profileImage ? (
+                <img src={profileImage} alt="Profile" className="h-full w-full object-cover" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center font-serif text-xl font-bold text-navy">
-                  {user.fullName?.[0] || "?"}
+                <div className={`flex h-full w-full items-center justify-center font-serif text-xl font-bold ${isVolunteer ? "text-emerald-700" : "text-navy"}`}>
+                  {initial}
                 </div>
               )}
             </div>
@@ -30,20 +40,20 @@ export function IdCard({ member, user, verificationUrl }) {
             <div className="space-y-1.5 flex-1 min-w-0">
               <div>
                 <p className="text-[9px] font-semibold uppercase text-muted-foreground">Name</p>
-                <p className="text-[13px] font-bold text-navy leading-none truncate">{user.fullName}</p>
+                <p className="text-[13px] font-bold text-navy leading-none truncate">{fullName}</p>
               </div>
               <div>
-                <p className="text-[9px] font-semibold uppercase text-muted-foreground">Member ID</p>
-                <p className="text-[13px] font-bold font-mono text-slate-700 leading-none">{member.memberId}</p>
+                <p className="text-[9px] font-semibold uppercase text-muted-foreground">{isVolunteer ? "Volunteer ID" : "Member ID"}</p>
+                <p className="text-[13px] font-bold font-mono text-slate-700 leading-none">{idNumber || "Pending"}</p>
               </div>
               <div className="flex gap-4">
                 <div>
                   <p className="text-[9px] font-semibold uppercase text-muted-foreground">Blood</p>
-                  <p className="text-[12px] font-bold text-rose-600 leading-none">{member.bloodGroup || "N/A"}</p>
+                  <p className="text-[12px] font-bold text-rose-600 leading-none">{bloodGroup || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-[9px] font-semibold uppercase text-muted-foreground">Type</p>
-                  <p className="text-[12px] font-bold text-slate-700 leading-none capitalize truncate">{member.membershipType}</p>
+                  <p className="text-[12px] font-bold text-slate-700 leading-none capitalize truncate">{typeLabel}</p>
                 </div>
               </div>
             </div>
@@ -56,7 +66,7 @@ export function IdCard({ member, user, verificationUrl }) {
             </div>
             {/* Dynamic QR Code */}
             <div className="size-12 shrink-0 rounded bg-white p-0.5 border border-slate-200">
-              <QRCodeSVG value={verificationUrl} size={44} className="h-full w-full" />
+              <QRCodeSVG value={verificationUrl || "https://realhumantrust.org"} size={44} className="h-full w-full" />
             </div>
           </div>
         </div>

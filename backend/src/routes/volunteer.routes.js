@@ -1,17 +1,32 @@
 const express = require("express");
-const { applyVolunteer, getAllVolunteers, getVolunteerById, updateVolunteerStatus, createVolunteer } = require("../controllers/volunteer.controller");
+const { 
+    applyVolunteer, 
+    loginVolunteer,
+    getMe,
+    updateMe,
+    getAllVolunteers, 
+    getVolunteerById, 
+    updateVolunteerStatus, 
+    createVolunteer 
+} = require("../controllers/volunteer.controller");
 const isAuthenticated = require("../middleware/auth");
 const authorizeRoles = require("../middleware/role");
+const upload = require("../utils/multer");
 
 const router = express.Router();
 
-// Public route
-router.post("/apply", applyVolunteer);
+// Public routes
+router.post("/apply", upload.single("profileImage"), applyVolunteer);
+router.post("/login", loginVolunteer);
+
+// Volunteer Protected routes
+router.get("/me", isAuthenticated, getMe);
+router.put("/me", isAuthenticated, upload.single("profileImage"), updateMe);
 
 // Admin / Manager / Coordinator routes
 router.get("/", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager", "coordinator"]), getAllVolunteers);
 router.get("/:id", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager", "coordinator"]), getVolunteerById);
 router.put("/:id/status", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager"]), updateVolunteerStatus);
-router.post("/", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager"]), createVolunteer);
+router.post("/", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager"]), upload.single("profileImage"), createVolunteer);
 
 module.exports = router;

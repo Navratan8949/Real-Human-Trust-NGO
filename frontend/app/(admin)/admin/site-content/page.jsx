@@ -53,6 +53,7 @@ export default function SiteContentAdminPage() {
     service: "", host: "", port: "", secure: false, user: "", pass: "", fromEmail: "", fromName: ""
   })
   const [pageHeroes, setPageHeroes] = useState({})
+  const [membershipPayment, setMembershipPayment] = useState({ amount: "", qrImage: "" })
 
   const PAGE_HERO_KEYS = [
     { key: "about", label: "About Us" },
@@ -182,6 +183,11 @@ export default function SiteContentAdminPage() {
       if (siteContent.page_heroes?.content) {
         try { setPageHeroes(JSON.parse(siteContent.page_heroes.content)) } catch (e) { }
       }
+
+      // 18. Membership Payment
+      if (siteContent.membership_payment?.content) {
+        try { setMembershipPayment(JSON.parse(siteContent.membership_payment.content)) } catch (e) { }
+      }
     }
   }, [siteContent])
 
@@ -262,6 +268,7 @@ export default function SiteContentAdminPage() {
           <TabsTrigger value="ngo_certificates">NGO Certificates</TabsTrigger>
           <TabsTrigger value="email_config">Email Settings</TabsTrigger>
           <TabsTrigger value="page_heroes">Page Heroes</TabsTrigger>
+          <TabsTrigger value="membership_payment">Membership Payment</TabsTrigger>
         </TabsList>
 
         {/* FOUNDER MESSAGE TAB */}
@@ -485,6 +492,32 @@ export default function SiteContentAdminPage() {
               </div>
               <Button onClick={() => saveContent("donate_details", "Donate Details", donateDetails)} disabled={isSaving}>
                 <Save className="mr-2 h-4 w-4" /> Save Donate Details
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* MEMBERSHIP PAYMENT TAB */}
+        <TabsContent value="membership_payment">
+          <Card>
+            <CardHeader><CardTitle>Membership Payment Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-semibold block mb-2">Membership Fee (e.g. ₹500)</label>
+                <Input value={membershipPayment.amount} onChange={(e) => setMembershipPayment({ ...membershipPayment, amount: e.target.value })} placeholder="₹500" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold block mb-2">Payment QR Code Image</label>
+                <div className="flex gap-4 items-center">
+                  {membershipPayment.qrImage && <Image src={membershipPayment.qrImage} width={100} height={100} className="rounded-md border p-1" alt="QR" />}
+                  <div>
+                    <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setMembershipPayment({ ...membershipPayment, qrImage: url }), "membership_qr")} />
+                    {uploadingImage === "membership_qr" && <Loader2 className="animate-spin h-5 w-5 text-accent mt-2" />}
+                  </div>
+                </div>
+              </div>
+              <Button onClick={() => saveContent("membership_payment", "Membership Payment", membershipPayment)} disabled={isSaving}>
+                <Save className="mr-2 h-4 w-4" /> Save Settings
               </Button>
             </CardContent>
           </Card>

@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
 import { SplashScreen } from "@/components/splash-screen/splash-screen"
 import { ReduxProvider } from "@/redux/Provider"
@@ -129,7 +128,6 @@ export default function RootLayout({ children }) {
           </SplashScreen>
           <Toaster position="top-center" richColors />
         </ReduxProvider>
-        {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
   )

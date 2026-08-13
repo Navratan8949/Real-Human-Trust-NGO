@@ -7,7 +7,7 @@ const app = express();
 app.use(morgan("dev"));
 app.use(
     cors({
-        origin: ["*", "https://real-human-trust-nu.vercel.app", "http://localhost:3000"],
+        origin: ["https://realhumantrust.org", "https://www.realhumantrust.org", "http://localhost:3000", "http://localhost:5173", "http://localhost:8080"],
         credentials: true,
     })
 );

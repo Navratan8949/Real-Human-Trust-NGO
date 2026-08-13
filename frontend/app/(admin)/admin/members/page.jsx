@@ -182,7 +182,7 @@ export default function Page() {
               <IdCard 
                 member={idCardMember} 
                 user={idCardMember.user} 
-                verificationUrl={`${typeof window !== "undefined" ? window.location.origin : "https://real-human-trust-nu.vercel.app"}/verify-member/${idCardMember.memberId}`} 
+                verificationUrl={`${typeof window !== "undefined" ? window.location.origin : "https://realhumantrust.org"}/verify-member/${idCardMember.memberId}`} 
               />
             </div>
             
@@ -256,25 +256,36 @@ export default function Page() {
                     )}
                   </div>
 
-                  <div className="mt-8 grid grid-cols-2 gap-6 border-t border-dashed border-border/60 pt-6">
+                  <div className="mt-8 grid grid-cols-3 gap-4 border-t border-dashed border-border/60 pt-6">
                     <div>
                       <p className="text-[10px] font-bold uppercase text-slate-500 mb-2">Profile Photo</p>
                       {selectedMember.profileImage?.url ? (
                         <a href={getFileUrl(selectedMember.profileImage.url)} target="_blank" rel="noreferrer" className="block rounded-xl border border-border/60 overflow-hidden hover:opacity-80 transition-opacity">
-                          <img src={getFileUrl(selectedMember.profileImage.url)} alt="Profile" className="w-full h-40 object-cover" />
+                          <img src={getFileUrl(selectedMember.profileImage.url)} alt="Profile" className="w-full h-32 object-cover" />
                         </a>
-                      ) : <div className="h-40 rounded-xl bg-slate-100 flex items-center justify-center text-xs text-slate-400">No Image</div>}
+                      ) : <div className="h-32 rounded-xl bg-slate-100 flex items-center justify-center text-xs text-slate-400">No Image</div>}
                     </div>
                     <div>
                       <p className="text-[10px] font-bold uppercase text-slate-500 mb-2">ID Proof</p>
                       {selectedMember.idProof?.url ? (
                         <a href={getFileUrl(selectedMember.idProof.url)} target="_blank" rel="noreferrer" className="block rounded-xl border border-border/60 overflow-hidden hover:opacity-80 transition-opacity">
                           {selectedMember.idProof.url.endsWith('.pdf') ?
-                            <div className="h-40 bg-slate-100 flex items-center justify-center font-bold text-slate-500">View PDF Proof</div>
-                            : <img src={getFileUrl(selectedMember.idProof.url)} alt="ID Proof" className="w-full h-40 object-cover" />
+                            <div className="h-32 bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs text-center px-2">View PDF</div>
+                            : <img src={getFileUrl(selectedMember.idProof.url)} alt="ID Proof" className="w-full h-32 object-cover" />
                           }
                         </a>
-                      ) : <div className="h-40 rounded-xl bg-slate-100 flex items-center justify-center text-xs text-slate-400">No Document</div>}
+                      ) : <div className="h-32 rounded-xl bg-slate-100 flex items-center justify-center text-xs text-slate-400">No Document</div>}
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase text-slate-500 mb-2">Payment Screenshot</p>
+                      {selectedMember.paymentScreenshot?.url ? (
+                        <a href={getFileUrl(selectedMember.paymentScreenshot.url)} target="_blank" rel="noreferrer" className="block rounded-xl border border-border/60 overflow-hidden hover:opacity-80 transition-opacity">
+                          {selectedMember.paymentScreenshot.url.endsWith('.pdf') ?
+                            <div className="h-32 bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs text-center px-2">View PDF</div>
+                            : <img src={getFileUrl(selectedMember.paymentScreenshot.url)} alt="Payment Screenshot" className="w-full h-32 object-cover" />
+                          }
+                        </a>
+                      ) : <div className="h-32 rounded-xl bg-slate-100 flex items-center justify-center text-xs text-slate-400 text-center px-2">No Payment</div>}
                     </div>
                   </div>
                 </TabsContent>

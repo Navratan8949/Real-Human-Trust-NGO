@@ -52,7 +52,24 @@ export const deleteVolunteer = async (id) => {
 
 export const applyVolunteer = async (data) => {
     try {
-        const response = await api.post("/volunteers/apply", data);
+        const response = await api.post("/volunteers/apply", data, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const loginVolunteer = async (data) => {
+    try {
+        const response = await api.post("/volunteers/login", data);
+        if (response.data.token) {
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+        }
         return response.data;
     } catch (error) {
         throw error;

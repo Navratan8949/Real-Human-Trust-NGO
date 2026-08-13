@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import { selectUser } from "@/redux/features/userSlice"
+import { fetchSiteContent } from "@/redux/features/siteContentSlice"
 import api from "@/service/api"
 import { CheckCircle2, ShieldAlert, UploadCloud, Loader2, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,19 @@ export default function MembershipPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
+  const dispatch = useDispatch()
+  const { data: siteContent } = useSelector((state) => state.siteContent)
+  const [membershipPayment, setMembershipPayment] = useState(null)
+  
+  useEffect(() => {
+    dispatch(fetchSiteContent())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (siteContent?.membership_payment?.content) {
+      try { setMembershipPayment(JSON.parse(siteContent.membership_payment.content)) } catch (e) { }
+    }
+  }, [siteContent])
   
   const [formData, setFormData] = useState({
     bloodGroup: "",
@@ -21,7 +35,8 @@ export default function MembershipPage() {
     membershipType: "general",
     referredBy: "",
     profileImage: null,
-    idProof: null
+    idProof: null,
+    paymentScreenshot: null
   })
 
   const handleFileChange = (e, field) => {
@@ -43,6 +58,7 @@ export default function MembershipPage() {
       data.append("referredBy", formData.referredBy)
       if (formData.profileImage) data.append("profileImage", formData.profileImage)
       if (formData.idProof) data.append("idProof", formData.idProof)
+      if (formData.paymentScreenshot) data.append("paymentScreenshot", formData.paymentScreenshot)
 
       await api.post("/members/apply", data, {
         headers: { "Content-Type": "multipart/form-data" }
@@ -164,6 +180,27 @@ export default function MembershipPage() {
                   </div>
                 </div>
               </div>
+
+              {membershipPayment?.amount && membershipPayment?.qrImage && (
+                <div className="pt-6 border-t border-border/50">
+                  <h3 className="font-serif text-lg font-bold text-navy mb-4">Membership Fee Payment</h3>
+                  <div className="rounded-2xl border border-accent/20 bg-accent/5 p-6 flex flex-col md:flex-row items-center gap-6">
+                    <div className="shrink-0 p-2 bg-white rounded-xl shadow-sm border border-border/50">
+                      <img src={membershipPayment.qrImage} alt="Payment QR" className="size-32 object-contain" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-navy mb-2">Scan & Pay: <span className="text-accent">{membershipPayment.amount}</span></p>
+                      <p className="text-sm text-muted-foreground mb-4">Please scan the QR code to pay the membership fee. After payment, upload the screenshot below.</p>
+                      <div className="relative rounded-xl border-2 border-dashed border-border/60 bg-white hover:bg-slate-50 transition-colors p-4 text-center cursor-pointer max-w-xs">
+                        <input required type="file" accept="image/*,.pdf" onChange={e => handleFileChange(e, 'paymentScreenshot')} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <UploadCloud className="mx-auto size-6 text-accent mb-2" />
+                        <p className="text-sm font-semibold text-navy">Upload Payment Screenshot *</p>
+                        <p className="text-xs text-muted-foreground mt-1">{formData.paymentScreenshot ? formData.paymentScreenshot.name : "JPEG, PNG, or PDF"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="pt-6">
                 <Button type="submit" disabled={loading} className="w-full h-14 rounded-xl bg-accent text-accent-foreground font-bold text-lg hover:bg-accent/90 shadow-md">

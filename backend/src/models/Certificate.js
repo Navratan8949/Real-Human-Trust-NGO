@@ -17,7 +17,11 @@ const Certificate = sequelize.define(
         },
         memberId: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
+        },
+        volunteerId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
         },
         certificateNo: {
             type: DataTypes.STRING,

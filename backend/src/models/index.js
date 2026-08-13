@@ -35,6 +35,10 @@ Member.belongsTo(User, { foreignKey: "createdById", as: "createdBy" });
 Member.hasMany(Certificate, { foreignKey: "memberId", as: "certificates", onDelete: "CASCADE" });
 Certificate.belongsTo(Member, { foreignKey: "memberId", as: "member" });
 
+// Volunteer <-> Certificate
+Volunteer.hasMany(Certificate, { foreignKey: "volunteerId", as: "certificates", onDelete: "CASCADE" });
+Certificate.belongsTo(Volunteer, { foreignKey: "volunteerId", as: "volunteer" });
+
 // Member <-> AppointmentLetter
 Member.hasMany(AppointmentLetter, { foreignKey: "memberId", as: "appointmentLetters", onDelete: "CASCADE" });
 AppointmentLetter.belongsTo(Member, { foreignKey: "memberId", as: "member" });

@@ -7,7 +7,7 @@ const getBaseUrl = () => {
         !window.location.hostname.includes("localhost") && 
         !window.location.hostname.includes("127.0.0.1") &&
         !window.location.hostname.startsWith("192.168.")) {
-        return "https://real-human-trust.onrender.com/api/v1";
+        return "https://realhumantrust.org/api/v1";
     }
     
     if (typeof window !== "undefined" && window.location.hostname) {

@@ -2,33 +2,45 @@
 import { useState, useEffect } from "react"
 import { AdminCrudPage, StatusBadge } from "@/components/admin/crud-page"
 import { getMembers } from "@/service/member.service"
+import { getVolunteers } from "@/service/volunteer.service"
 import { getFileUrl } from "@/lib/utils"
 
 export default function Page() {
-  const [memberOptions, setMemberOptions] = useState([])
+  const [recipientOptions, setRecipientOptions] = useState([])
   
   useEffect(() => {
-    // Fetch members to populate the select dropdown
-    getMembers()
-      .then(res => {
-        if (res.success) {
-          const options = res.members.map(m => ({
-            label: `${m.user?.fullName || 'Unknown'} (${m.memberId})`,
-            value: m._id
-          }))
-          setMemberOptions(options)
-        }
-      })
-      .catch(console.error)
+    Promise.all([
+      getMembers().catch(() => ({ members: [] })),
+      getVolunteers().catch(() => ({ volunteers: [] }))
+    ]).then(([memRes, volRes]) => {
+      const options = []
+      if (memRes.members) {
+        memRes.members.forEach(m => {
+          options.push({
+            label: `[Member] ${m.user?.fullName || 'Unknown'} (${m.memberId})`,
+            value: `member_${m._id || m.id}`
+          })
+        })
+      }
+      if (volRes.volunteers) {
+        volRes.volunteers.filter(v => v.status === "approved").forEach(v => {
+          options.push({
+            label: `[Volunteer] ${v.fullName} (${v.volunteerId || 'Pending'})`,
+            value: `volunteer_${v._id || v.id}`
+          })
+        })
+      }
+      setRecipientOptions(options)
+    })
   }, [])
 
   const certificateSchema = [
     { 
-      name: "member", 
-      label: "Select Member", 
+      name: "recipient", 
+      label: "Select Recipient", 
       type: "select", 
       required: true,
-      options: memberOptions
+      options: recipientOptions
     },
     { name: "certificateNo", label: "Certificate Number", type: "text", required: true },
     { name: "title", label: "Certificate Title", type: "text", required: true },
@@ -49,9 +61,13 @@ export default function Page() {
     { key: "certificateNo", label: "Cert No." },
     { key: "title", label: "Title" },
     { 
-      key: "member", 
+      key: "recipient", 
       label: "Issued To",
-      render: (r) => r.member?.user?.fullName || "Unknown"
+      render: (r) => {
+        if (r.member) return <span className="text-blue-700 font-medium">[Member] {r.member?.user?.fullName}</span>
+        if (r.volunteer) return <span className="text-emerald-700 font-medium">[Volunteer] {r.volunteer?.fullName}</span>
+        return "Unknown"
+      }
     },
     { 
       key: "pdf", 
@@ -78,6 +94,24 @@ export default function Page() {
       endpoint="/certificates"
       schema={certificateSchema}
       columns={columns}
+      onBeforeSubmit={(data) => {
+        // Parse the composite recipient value back into memberId or volunteerId
+        const parsedData = { ...data }
+        if (parsedData.recipient) {
+          const [type, id] = parsedData.recipient.split("_")
+          if (type === "member") {
+            parsedData.memberId = id
+            parsedData.member = id
+            parsedData.volunteerId = null
+          } else if (type === "volunteer") {
+            parsedData.volunteerId = id
+            parsedData.volunteer = id
+            parsedData.memberId = null
+          }
+          delete parsedData.recipient
+        }
+        return parsedData
+      }}
     />
   )
 }

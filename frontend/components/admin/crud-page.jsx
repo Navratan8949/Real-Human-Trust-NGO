@@ -39,7 +39,8 @@ export function AdminCrudPage({
   hideDelete,
   hideEdit,
   hideExport,
-  crudRef
+  crudRef,
+  onBeforeSubmit
 }) {
   const crud = useCrud(endpoint)
   const { data, loading, error, createItem, updateItem, deleteItem } = crud
@@ -152,10 +153,15 @@ export function AdminCrudPage({
   }
 
   const handleSubmit = async (formData) => {
+    let finalData = formData
+    if (onBeforeSubmit) {
+      finalData = onBeforeSubmit(formData)
+    }
+    
     if (editingItem) {
-      await updateItem(editingItem._id || editingItem.id, formData)
+      await updateItem(editingItem._id || editingItem.id, finalData)
     } else {
-      await createItem(formData)
+      await createItem(finalData)
     }
   }
 

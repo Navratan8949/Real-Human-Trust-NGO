@@ -55,6 +55,15 @@ exports.applyMembership = async (req, res) => {
             }
         }
 
+        let paymentScreenshot = existingMember ? existingMember.paymentScreenshot : { public_id: "", url: "" };
+        const paymentScreenshotFile = req.files && req.files["paymentScreenshot"] ? req.files["paymentScreenshot"][0] : null;
+        if (paymentScreenshotFile) {
+            const uploadResult = await uploadOnCloudinary(paymentScreenshotFile.path);
+            if (uploadResult) {
+                paymentScreenshot = { public_id: uploadResult.public_id, url: uploadResult.url };
+            }
+        }
+
         let member;
         if (existingMember) {
             existingMember.bloodGroup = bloodGroup || "";
@@ -63,6 +72,7 @@ exports.applyMembership = async (req, res) => {
             existingMember.referredById = resolvedReferrerId;
             existingMember.profileImage = profileImage;
             existingMember.idProof = idProof;
+            existingMember.paymentScreenshot = paymentScreenshot;
             existingMember.membershipStatus = "pending";
             existingMember.rejectionReason = "";
             await existingMember.save();
@@ -77,6 +87,7 @@ exports.applyMembership = async (req, res) => {
                 referredById: resolvedReferrerId,
                 profileImage,
                 idProof,
+                paymentScreenshot,
                 membershipStatus: "pending",
             });
         }
@@ -113,7 +124,7 @@ exports.approveMember = async (req, res) => {
 
         member.membershipStatus = "approved";
 
-        const verificationLink = `${process.env.FRONTEND_URL || "https://real-human-trust-nu.vercel.app"}/verify-member/${member.memberId}`;
+        const verificationLink = `${process.env.FRONTEND_URL || "https://realhumantrust.org"}/verify-member/${member.memberId}`;
         const qrCodeData = await QRCode.toDataURL(verificationLink);
 
         member.qrCode = qrCodeData;
@@ -274,7 +285,7 @@ exports.createMemberDirectly = async (req, res) => {
             membershipStatus: "approved",
         });
 
-        const verificationLink = `${process.env.FRONTEND_URL || "https://real-human-trust-nu.vercel.app"}/verify-member/${member.memberId}`;
+        const verificationLink = `${process.env.FRONTEND_URL || "https://realhumantrust.org"}/verify-member/${member.memberId}`;
         member.qrCode = await QRCode.toDataURL(verificationLink);
         await member.save();
 

@@ -33,6 +33,10 @@ const Member = sequelize.define(
             type: DataTypes.JSON,
             defaultValue: { public_id: "", url: "" },
         },
+        paymentScreenshot: {
+            type: DataTypes.JSON,
+            defaultValue: { public_id: "", url: "" },
+        },
         bloodGroup: {
             type: DataTypes.ENUM("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", ""),
             defaultValue: "",

@@ -11,7 +11,8 @@ router.get("/verify/:memberId", verifyPublicMember);
 
 router.post("/apply", isAuthenticated, upload.fields([
     { name: "profileImage", maxCount: 1 },
-    { name: "idProof", maxCount: 1 }
+    { name: "idProof", maxCount: 1 },
+    { name: "paymentScreenshot", maxCount: 1 }
 ]), applyMembership);
 
 router.get("/me", isAuthenticated, getMyProfile);
