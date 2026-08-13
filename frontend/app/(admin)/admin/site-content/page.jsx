@@ -244,7 +244,7 @@ export default function SiteContentAdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-8 flex flex-wrap h-auto gap-2 justify-start bg-secondary/30 p-2 rounded-xl">
+        <TabsList className="mb-8 flex flex-nowrap overflow-x-auto overflow-y-hidden h-auto gap-2 justify-start bg-secondary/30 p-2 rounded-xl pb-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
           <TabsTrigger value="founder_message">Founder</TabsTrigger>
           <TabsTrigger value="home_hero">Hero Slider</TabsTrigger>
           <TabsTrigger value="about_preview">About (Home)</TabsTrigger>
