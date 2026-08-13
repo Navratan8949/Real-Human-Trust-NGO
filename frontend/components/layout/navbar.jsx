@@ -203,11 +203,11 @@ function TopBar() {
             <>
               <Link href="/login" className="inline-flex items-center gap-1 text-white/70 transition hover:text-white text-[11px] font-semibold">
                 <User className="size-3" />
-                Member
+                Member Login
               </Link>
               <Link href="/volunteer/login" className="inline-flex items-center gap-1 text-white/70 transition hover:text-white text-[11px] font-semibold">
                 <User className="size-3" />
-                Volunteer
+                Volunteer Login
               </Link>
               <Link href="/admin-login" className="inline-flex items-center gap-1 text-white/70 transition hover:text-white text-[11px] font-semibold">
                 <Lock className="size-3" />
