@@ -1,5 +1,5 @@
 const express = require("express");
-const { applyVolunteer, getAllVolunteers, getVolunteerById, updateVolunteerStatus } = require("../controllers/volunteer.controller");
+const { applyVolunteer, getAllVolunteers, getVolunteerById, updateVolunteerStatus, createVolunteer } = require("../controllers/volunteer.controller");
 const isAuthenticated = require("../middleware/auth");
 const authorizeRoles = require("../middleware/role");
 
