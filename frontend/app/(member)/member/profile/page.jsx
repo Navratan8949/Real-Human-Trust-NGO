@@ -3,8 +3,9 @@ import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { selectUser } from "@/redux/features/userSlice"
 import api from "@/service/api"
-import { CheckCircle2, Loader2, UserCircle2, Mail, Phone, MapPin, Briefcase, Droplet, Calendar, FileText } from "lucide-react"
 import Link from "next/link"
+import { CheckCircle2, Loader2, UserCircle2, Mail, Phone, MapPin, Briefcase, Droplet, Calendar, FileText, Printer, XCircle } from "lucide-react"
+import { IdCard } from "@/components/shared/id-card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -23,6 +24,7 @@ export default function Page() {
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({})
   const [profileImage, setProfileImage] = useState(null)
+  const [showIdCard, setShowIdCard] = useState(false)
 
   useEffect(() => {
     async function fetchProfile() {
@@ -167,6 +169,11 @@ export default function Page() {
                     <Button asChild size="sm" className="rounded-lg bg-rose-600 text-white hover:bg-rose-700"><Link href="/membership">Apply Again</Link></Button>
                   </div>
                 )}
+                {member.membershipStatus === 'approved' && (
+                  <Button size="sm" onClick={() => setShowIdCard(true)} className="ml-auto rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm font-bold h-8 text-xs">
+                    <Printer className="mr-1.5 size-3.5" /> ID Card
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="mt-4">
@@ -231,6 +238,43 @@ export default function Page() {
           </div>
         )}
       </div>
+
+      {showIdCard && member && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <style dangerouslySetInnerHTML={{__html: `
+            @media print {
+              body * { visibility: hidden; }
+              #id-card, #id-card * { visibility: visible; }
+              #id-card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+            }
+          `}} />
+          <div className="w-full max-w-md rounded-2xl bg-slate-50 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-border/50 bg-white px-6 py-4 shrink-0">
+              <h3 className="font-serif text-xl font-bold text-navy">Member ID Card</h3>
+              <button onClick={() => setShowIdCard(false)} className="text-muted-foreground hover:text-navy transition-colors">
+                <XCircle className="size-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto bg-slate-100/50 flex justify-center">
+              <IdCard 
+                member={member} 
+                user={user} 
+                verificationUrl={`${typeof window !== "undefined" ? window.location.origin : "https://realhumantrust.org"}/verify-member/${member.memberId}`} 
+              />
+            </div>
+            
+            <div className="bg-white px-6 py-4 border-t border-border/50 shrink-0 flex gap-4">
+              <Button onClick={() => window.print()} className="flex-1 bg-navy text-white hover:bg-navy/90 h-10 rounded-xl font-bold">
+                <Printer className="size-4 mr-2" /> Print Card
+              </Button>
+              <Button variant="outline" onClick={() => setShowIdCard(false)} className="flex-1 h-10 rounded-xl font-semibold">
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -10,12 +10,7 @@ exports.getAllNGOCertificates = async (req, res) => {
             order: [["issueDate", "DESC"]],
         });
 
-        const populated = certificates.map(cert => ({
-            ...cert.toJSON(),
-            populatedTemplate: populateTemplate(cert.template, cert),
-        }));
-
-        res.status(200).json({ success: true, count: populated.length, certificates: populated });
+        res.status(200).json({ success: true, count: certificates.length, certificates });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -27,12 +22,7 @@ exports.getNGOCertificateById = async (req, res) => {
         const certificate = await NGOCertificate.findByPk(req.params.id);
         if (!certificate) return res.status(404).json({ success: false, message: "Certificate not found" });
 
-        const populated = {
-            ...certificate.toJSON(),
-            populatedTemplate: populateTemplate(certificate.template, certificate),
-        };
-
-        res.status(200).json({ success: true, certificate: populated });
+        res.status(200).json({ success: true, certificate });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

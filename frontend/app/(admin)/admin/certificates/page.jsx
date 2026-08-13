@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { AdminCrudPage, StatusBadge } from "@/components/admin/crud-page"
 import { getMembers } from "@/service/member.service"
+import { getFileUrl } from "@/lib/utils"
 
 export default function Page() {
   const [memberOptions, setMemberOptions] = useState([])
@@ -60,10 +61,10 @@ export default function Page() {
         const isImage = r.pdf.url.match(/\.(jpeg|jpg|gif|png|webp)$/i)
         return isImage ? (
           <div className="relative h-12 w-20 overflow-hidden rounded border">
-            <img src={r.pdf.url} alt="Certificate" className="h-full w-full object-cover" />
+            <img src={getFileUrl(r.pdf.url)} alt="Certificate" className="h-full w-full object-cover" />
           </div>
         ) : (
-          <a href={r.pdf.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View PDF</a>
+          <a href={getFileUrl(r.pdf.url)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View PDF</a>
         )
       }
     },

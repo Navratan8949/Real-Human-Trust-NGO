@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import api from "@/service/api"
 import { Loader2, FileText, Download, Briefcase, Calendar } from "lucide-react"
+import { getFileUrl, forceDownload } from "@/lib/utils"
 
 export default function Page() {
   const [appointments, setAppointments] = useState([])
@@ -70,9 +71,9 @@ export default function Page() {
               
               <div className="mt-auto border-t border-dashed border-border/60 bg-slate-50 p-4">
                 {app.pdf?.url ? (
-                  <a href={app.pdf.url} download target="_blank" rel="noreferrer" className="flex w-full items-center justify-center gap-2 rounded-lg bg-navy px-3 py-2 text-xs font-semibold text-white hover:bg-navy/90 transition-colors">
+                  <button onClick={() => forceDownload(getFileUrl(app.pdf.url), `Appointment_Letter_${app.letterNo}.pdf`)} className="flex w-full items-center justify-center gap-2 rounded-lg bg-navy px-3 py-2 text-xs font-semibold text-white hover:bg-navy/90 transition-colors">
                     <Download className="size-4" /> Download PDF
-                  </a>
+                  </button>
                 ) : (
                   <button disabled className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-slate-200 px-3 py-2 text-xs font-semibold text-slate-400">
                     No PDF Available

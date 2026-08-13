@@ -10,6 +10,7 @@ import { useSelector } from "react-redux"
 import { selectUser } from "@/redux/features/userSlice"
 import { canAccessAdminModule } from "@/lib/admin-permissions"
 import { IdCard } from "@/components/shared/id-card"
+import { getFileUrl } from "@/lib/utils"
 
 const memberSchema = [
   { name: "fullName", label: "Full Name", type: "text", required: true },
@@ -51,6 +52,8 @@ export default function Page() {
   const [memberCertificates, setMemberCertificates] = useState([])
   const [loadingDetails, setLoadingDetails] = useState(false)
 
+  const [activeTab, setActiveTab] = useState("details")
+
   const loadMemberDetails = async (member) => {
     setLoadingDetails(true)
     try {
@@ -67,8 +70,9 @@ export default function Page() {
     setLoadingDetails(false)
   }
 
-  const handleView = async (member) => {
+  const handleView = async (member, tab = "details") => {
     setSelectedMember(member)
+    setActiveTab(tab)
     setIsRejecting(false)
     setRejectReason("")
     await loadMemberDetails(member)
@@ -113,7 +117,7 @@ export default function Page() {
               if (!r.referredBy) return <span className="text-muted-foreground text-xs">-</span>
               const refObj = typeof r.referredBy === "object" ? r.referredBy : null
               const name = refObj?.fullName || refObj?.email || (typeof r.referredBy === "string" ? `ID: ${r.referredBy.slice(-6)}` : "Unknown")
-              const imgUrl = refObj?.profileImage?.url
+              const imgUrl = refObj?.profileImage?.url ? getFileUrl(refObj.profileImage.url) : null
 
               return (
                 <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 text-xs font-semibold">
@@ -134,14 +138,22 @@ export default function Page() {
             key: "actions",
             label: "Actions",
             render: (r) => (
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => handleView(r)} className="rounded-lg h-7 px-3 bg-navy/5 text-navy hover:bg-navy hover:text-white border-navy/20">
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => handleView(r, "details")} className="rounded-lg h-7 px-3 bg-navy/5 text-navy hover:bg-navy hover:text-white border-navy/20">
                   <Eye className="size-3.5 mr-1.5" /> View
                 </Button>
                 {r.membershipStatus === 'approved' && (
-                  <Button size="sm" variant="outline" onClick={() => setIdCardMember(r)} className="rounded-lg h-7 px-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border-emerald-200">
-                    <Printer className="size-3.5 mr-1.5" /> ID Card
-                  </Button>
+                  <>
+                    <Button size="sm" variant="outline" onClick={() => setIdCardMember(r)} className="rounded-lg h-7 px-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border-emerald-200">
+                      <Printer className="size-3.5 mr-1.5" /> ID Card
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleView(r, "certificates")} className="rounded-lg h-7 px-3 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white border-blue-200">
+                      <FileBadge className="size-3.5 mr-1.5" /> Certificate
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleView(r, "appointments")} className="rounded-lg h-7 px-3 bg-purple-50 text-purple-700 hover:bg-purple-600 hover:text-white border-purple-200">
+                      <FileText className="size-3.5 mr-1.5" /> Appointment
+                    </Button>
+                  </>
                 )}
               </div>
             )
@@ -197,7 +209,7 @@ export default function Page() {
             </div>
 
             <div className="p-6 overflow-y-auto">
-              <Tabs defaultValue="details" className="w-full">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="mb-6">
                   <TabsTrigger value="details">Details</TabsTrigger>
                   <TabsTrigger value="appointments">Appointments</TabsTrigger>
@@ -219,7 +231,7 @@ export default function Page() {
                       {selectedMember.referredBy ? (
                         <div className="flex items-center gap-2">
                           {(typeof selectedMember.referredBy === "object" && selectedMember.referredBy?.profileImage?.url) ? (
-                            <img src={selectedMember.referredBy.profileImage.url} alt="Referrer" className="size-7 rounded-full object-cover border border-slate-300" />
+                            <img src={getFileUrl(selectedMember.referredBy.profileImage.url)} alt="Referrer" className="size-7 rounded-full object-cover border border-slate-300" />
                           ) : (
                             <div className="size-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center border border-slate-300">
                               {(typeof selectedMember.referredBy === "object" ? (selectedMember.referredBy?.fullName || selectedMember.referredBy?.email || "R") : "R").charAt(0).toUpperCase()}
@@ -248,18 +260,18 @@ export default function Page() {
                     <div>
                       <p className="text-[10px] font-bold uppercase text-slate-500 mb-2">Profile Photo</p>
                       {selectedMember.profileImage?.url ? (
-                        <a href={selectedMember.profileImage.url} target="_blank" rel="noreferrer" className="block rounded-xl border border-border/60 overflow-hidden hover:opacity-80 transition-opacity">
-                          <img src={selectedMember.profileImage.url} alt="Profile" className="w-full h-40 object-cover" />
+                        <a href={getFileUrl(selectedMember.profileImage.url)} target="_blank" rel="noreferrer" className="block rounded-xl border border-border/60 overflow-hidden hover:opacity-80 transition-opacity">
+                          <img src={getFileUrl(selectedMember.profileImage.url)} alt="Profile" className="w-full h-40 object-cover" />
                         </a>
                       ) : <div className="h-40 rounded-xl bg-slate-100 flex items-center justify-center text-xs text-slate-400">No Image</div>}
                     </div>
                     <div>
                       <p className="text-[10px] font-bold uppercase text-slate-500 mb-2">ID Proof</p>
                       {selectedMember.idProof?.url ? (
-                        <a href={selectedMember.idProof.url} target="_blank" rel="noreferrer" className="block rounded-xl border border-border/60 overflow-hidden hover:opacity-80 transition-opacity">
+                        <a href={getFileUrl(selectedMember.idProof.url)} target="_blank" rel="noreferrer" className="block rounded-xl border border-border/60 overflow-hidden hover:opacity-80 transition-opacity">
                           {selectedMember.idProof.url.endsWith('.pdf') ?
                             <div className="h-40 bg-slate-100 flex items-center justify-center font-bold text-slate-500">View PDF Proof</div>
-                            : <img src={selectedMember.idProof.url} alt="ID Proof" className="w-full h-40 object-cover" />
+                            : <img src={getFileUrl(selectedMember.idProof.url)} alt="ID Proof" className="w-full h-40 object-cover" />
                           }
                         </a>
                       ) : <div className="h-40 rounded-xl bg-slate-100 flex items-center justify-center text-xs text-slate-400">No Document</div>}
@@ -281,7 +293,7 @@ export default function Page() {
                             <p className="text-xs text-muted-foreground">Letter No: {apt.letterNo} | Dept: {apt.department || "N/A"} | Joined: {apt.joiningDate ? new Date(apt.joiningDate).toLocaleDateString() : "N/A"}</p>
                           </div>
                           {apt.pdf?.url && (
-                            <a href={apt.pdf.url} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                            <a href={getFileUrl(apt.pdf.url)} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1">
                               <FileText className="size-4" /> Download
                             </a>
                           )}
@@ -305,7 +317,7 @@ export default function Page() {
                             <p className="text-xs text-muted-foreground">Cert No: {cert.certificateNo} | Issued: {cert.issueDate ? new Date(cert.issueDate).toLocaleDateString() : "N/A"}</p>
                           </div>
                           {cert.pdf?.url && (
-                            <a href={cert.pdf.url} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                            <a href={getFileUrl(cert.pdf.url)} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1">
                               <FileBadge className="size-4" /> View
                             </a>
                           )}

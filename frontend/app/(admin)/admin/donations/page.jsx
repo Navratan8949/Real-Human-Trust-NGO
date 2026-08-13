@@ -5,6 +5,7 @@ import api from "@/service/api"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, XCircle, Eye, ExternalLink, Image as ImageIcon, CreditCard } from "lucide-react"
+import { getFileUrl } from "@/lib/utils"
 import {
   Dialog,
   DialogContent,
@@ -81,7 +82,7 @@ export default function Page() {
       label: "Proof", 
       render: (r) => r.paymentProof?.url ? (
         <a 
-          href={r.paymentProof.url} 
+          href={getFileUrl(r.paymentProof.url)} 
           target="_blank" 
           rel="noreferrer" 
           className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
@@ -241,9 +242,9 @@ export default function Page() {
               {selectedDonation.paymentProof?.url && (
                 <div>
                   <span className="text-xs font-bold text-muted-foreground uppercase block mb-2">Payment Proof Screenshot</span>
-                  <a href={selectedDonation.paymentProof.url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl border border-border/80 group">
+                  <a href={getFileUrl(selectedDonation.paymentProof.url)} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl border border-border/80 group">
                     <img 
-                      src={selectedDonation.paymentProof.url} 
+                      src={getFileUrl(selectedDonation.paymentProof.url)} 
                       alt="Payment Proof" 
                       className="w-full max-h-48 object-cover group-hover:scale-105 transition-transform" 
                     />

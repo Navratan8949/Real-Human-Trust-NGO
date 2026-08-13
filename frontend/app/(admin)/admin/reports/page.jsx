@@ -1,5 +1,6 @@
 "use client"
 import { AdminCrudPage, StatusBadge } from "@/components/admin/crud-page"
+import { getFileUrl } from "@/lib/utils"
 
 const REPORT_SCHEMA = [
   { name: "title", label: "Report Title", type: "text", required: true },
@@ -39,7 +40,7 @@ const COLUMNS = [
     key: "pdf", 
     label: "Document", 
     render: (r) => r.pdf?.url ? (
-      <a href={r.pdf.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-navy hover:underline">
+      <a href={getFileUrl(r.pdf.url)} target="_blank" rel="noreferrer" className="text-xs font-semibold text-navy hover:underline">
         View PDF
       </a>
     ) : (

@@ -3,6 +3,8 @@ import { useState, useEffect } from "react"
 import { getMyCertificates } from "@/service/certificate.service"
 import { Award, FileBadge, Download, Loader2 } from "lucide-react"
 
+import { getFileUrl, forceDownload } from "@/lib/utils"
+
 export default function MemberCertificatesPage() {
   const [certificates, setCertificates] = useState([])
   const [loading, setLoading] = useState(true)
@@ -53,16 +55,13 @@ export default function MemberCertificatesPage() {
                   </span>
                   
                   {cert.pdf?.url && cert.status !== "cancelled" ? (
-                    <a 
-                      href={cert.pdf.url} 
-                      download
-                      target="_blank" 
-                      rel="noopener noreferrer" 
+                    <button 
+                      onClick={() => forceDownload(getFileUrl(cert.pdf.url), cert.title)}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-navy/90"
                     >
                       <Download className="size-3.5" />
                       Download
-                    </a>
+                    </button>
                   ) : (
                     <span className="text-xs text-muted-foreground italic">File not available</span>
                   )}

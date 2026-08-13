@@ -1,5 +1,6 @@
 "use client"
 import { AdminCrudPage, StatusBadge } from "@/components/admin/crud-page"
+import { getFileUrl } from "@/lib/utils"
 
 const DOWNLOAD_SCHEMA = [
   { name: "title", label: "Document Title", type: "text", required: true },
@@ -38,7 +39,7 @@ const COLUMNS = [
     key: "file", 
     label: "Document", 
     render: (r) => r.file?.url ? (
-      <a href={r.file.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-navy hover:underline">
+      <a href={getFileUrl(r.file.url)} target="_blank" rel="noreferrer" className="text-xs font-semibold text-navy hover:underline">
         View File
       </a>
     ) : (

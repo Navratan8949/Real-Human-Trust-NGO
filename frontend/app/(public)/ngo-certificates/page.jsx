@@ -2,37 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { getNGOCertificates } from "@/service/ngo-certificate.service"
-import { Award, ExternalLink, Download } from "lucide-react"
+import { Award, Download, Eye } from "lucide-react"
 import Image from "next/image"
+import { getFileUrl, forceDownload } from "@/lib/utils"
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
-const DEFAULT_CERTIFICATE_TEMPLATE = (cert) => `
-  <div style="text-align:center; padding: 40px 30px; font-family: 'Georgia', serif;">
-    <div style="border: 4px double #1a3c6c; padding: 30px; border-radius: 12px; background: #ffffff;">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: #1a3c6c; font-size: 32px; margin: 0; font-weight: bold; letter-spacing: 2px;">CERTIFICATE</h1>
-        <div style="width: 80px; height: 3px; background: #d4af37; margin: 10px auto;"></div>
-      </div>
-      <p style="font-size: 16px; color: #555; margin-bottom: 25px;">This is to certify that</p>
-      <h2 style="color: #1a3c6c; font-size: 24px; margin-bottom: 20px; font-weight: bold;">Real Human Education & Charitable Trust</h2>
-      <p style="font-size: 15px; color: #444; line-height: 1.8; margin-bottom: 20px;">
-        is a registered organization under the<br/>
-        <strong style="color: #1a3c6c;">${cert.issuedBy || "Government Authority"}</strong><br/>
-        <strong>Certificate No: ${cert.certificateNo}</strong>
-      </p>
-      ${cert.description ? `<p style="font-size: 14px; color: #666; margin-bottom: 25px; font-style: italic;">"${cert.description}"</p>` : ''}
-      <div style="margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
-        <div style="text-align: left;">
-          <div style="border-top: 1px solid #1a3c6c; width: 150px; padding-top: 5px; font-size: 12px; color: #666;">Date of Issue</div>
-          <p style="font-weight: bold; color: #1a3c6c; margin-top: 5px;">${cert.issueDate ? new Date(cert.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-        </div>
-        <div style="text-align: center;">
-          ${cert.sealImage?.url ? `<img src="${cert.sealImage.url}" alt="Official Seal" style="width: 80px; height: 80px; object-fit: contain; border-radius: 50%; border: 2px solid #d4af37;" />` : '<div style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #d4af37; display: flex; align-items: center; justify-content: center; color: #d4af37; font-size: 12px; margin: 0 auto;">OFFICIAL SEAL</div>'}
-          <p style="font-size: 11px; color: #888; margin-top: 5px;">Authorized Signature</p>
-        </div>
-      </div>
-    </div>
-  </div>
-`
+const DEFAULT_CERTIFICATE_TEMPLATE = (cert) => ``
 
 export default function Page() {
   const [certificates, setCertificates] = useState([])
@@ -78,37 +53,75 @@ export default function Page() {
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {certificates.filter(c => c.isActive !== false).map((cert) => (
-              <div key={cert._id || cert.id} className="group rounded-3xl border border-border bg-white shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
-                {/* Certificate Preview */}
-                <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
-                  {cert.backgroundImage?.url ? (
-                    <Image src={cert.backgroundImage.url} alt={cert.title} fill className="object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-                      <Award className="size-16 text-slate-300" />
+              <div key={cert._id || cert.id} className="group flex flex-col rounded-2xl border border-border/60 bg-white shadow-soft hover:shadow-md transition-all duration-300">
+                <div className="p-5 flex-1">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-navy/5 text-navy">
+                      <Award className="size-5" />
                     </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
-                </div>
-                
-                {/* Certificate Template Render */}
-                <div className="p-6">
-                  <div 
-                    className="certificate-template rounded-xl border border-border/60 bg-white p-6 shadow-sm"
-                    dangerouslySetInnerHTML={{ __html: cert.populatedTemplate || cert.template || DEFAULT_CERTIFICATE_TEMPLATE(cert) }}
-                  />
+                    <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">
+                      Active
+                    </span>
+                  </div>
                   
-                  <div className="mt-4 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-serif text-lg font-bold text-navy">{cert.title}</h3>
-                      <p className="text-xs text-muted-foreground font-mono">Cert No: {cert.certificateNo}</p>
+                  <h3 className="font-serif text-lg font-bold text-navy leading-tight">{cert.title}</h3>
+                  
+                  <div className="mt-5 space-y-2.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 font-mono border-b border-slate-100 pb-2">
+                      <span>Cert No:</span>
+                      <span className="font-semibold text-slate-800">{cert.certificateNo}</span>
                     </div>
-                    {cert.pdf?.url && (
-                      <a href={cert.pdf.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:text-accent bg-navy/5 hover:bg-navy/10 px-3 py-1.5 rounded-lg transition-colors">
-                        <Download className="size-3.5" /> PDF
-                      </a>
+                    {cert.issueDate && (
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 border-b border-slate-100 pb-2">
+                        <span>Issue Date:</span>
+                        <span className="font-semibold text-slate-800">{new Date(cert.issueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                      </div>
+                    )}
+                    {cert.issuedBy && (
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500">
+                        <span>Issued By:</span>
+                        <span className="font-semibold text-slate-800 text-right max-w-[150px] truncate" title={cert.issuedBy}>{cert.issuedBy}</span>
+                      </div>
                     )}
                   </div>
+                </div>
+
+                <div className="border-t border-dashed border-border/60 bg-slate-50 p-4 flex items-center gap-3 rounded-b-2xl">
+                  {cert.image?.url ? (
+                    <Dialog>
+                      <DialogTrigger className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-accent/90">
+                        <Eye className="size-4" /> View
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl p-0 overflow-hidden border-none bg-transparent shadow-none" showCloseButton={false}>
+                        <div className="relative rounded-2xl bg-black/90 p-4 shadow-2xl flex items-center justify-center min-h-[400px]">
+                          <img src={getFileUrl(cert.image.url)} alt={cert.title} className="max-w-full max-h-[80vh] object-contain rounded-lg" />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  ) : cert.pdf?.url ? (
+                    <a 
+                      href={getFileUrl(cert.pdf.url)} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-accent/90"
+                    >
+                      <Eye className="size-4" /> View
+                    </a>
+                  ) : (
+                    <button disabled className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-200 px-4 py-2.5 text-sm font-bold text-slate-400 cursor-not-allowed">
+                      <Eye className="size-4" /> View
+                    </button>
+                  )}
+
+                  {(cert.pdf?.url || cert.image?.url) && (
+                    <button 
+                      onClick={() => forceDownload(getFileUrl(cert.pdf?.url || cert.image?.url), cert.title)}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-navy px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-navy/90"
+                      title="Download"
+                    >
+                      <Download className="size-4" /> Download
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

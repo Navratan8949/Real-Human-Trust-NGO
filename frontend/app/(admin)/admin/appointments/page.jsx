@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { AdminCrudPage } from "@/components/admin/crud-page"
 import { getMembers } from "@/service/member.service"
+import { getFileUrl } from "@/lib/utils"
 
 export default function Page() {
   const [memberOptions, setMemberOptions] = useState([])
@@ -46,7 +47,7 @@ export default function Page() {
       key: "pdf",
       label: "Document",
       render: (r) => r.pdf?.url ? (
-        <a href={r.pdf.url} download target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Download PDF</a>
+        <a href={getFileUrl(r.pdf.url)} download target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Download PDF</a>
       ) : <span className="text-muted-foreground text-xs">No PDF</span>
     }
   ]
