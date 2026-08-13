@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Volunteer } = require("../models");
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -97,6 +97,12 @@ exports.register = async (req, res) => {
         });
 
         const token = generateToken(user.id);
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+        });
 
         res.status(201).json({
             success: true,
@@ -234,6 +240,16 @@ exports.adminLogin = async (req, res) => {
 
 exports.getMe = async (req, res) => {
     try {
+        if (req.user.role === "volunteer") {
+            const volunteer = await Volunteer.findByPk(req.user.id, {
+                attributes: { exclude: ["password"] },
+            });
+            return res.status(200).json({
+                success: true,
+                user: { ...volunteer.toJSON(), role: "volunteer" },
+            });
+        }
+
         const user = await User.findByPk(req.user.id, {
             attributes: { exclude: ["password"] },
         });

@@ -3,7 +3,7 @@ const { User, Volunteer } = require("../models");
 
 const isAuthenticated = async (req, res, next) => {
     try {
-        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+        const token = req.headers.authorization?.split(" ")[1] || req.cookies?.token;
 
         if (!token) {
             return res.status(401).json({
@@ -60,7 +60,7 @@ const isAuthenticated = async (req, res, next) => {
 
 const checkOptionalAuth = async (req, res, next) => {
     try {
-        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+        const token = req.headers.authorization?.split(" ")[1] || req.cookies?.token;
         if (!token) return next();
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret123');
