@@ -33,6 +33,18 @@ export default function MemberLayout({ children }) {
   const [memberInfo, setMemberInfo] = useState(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
+  const handleLogout = async () => {
+    try {
+      await api.get("/auth/logout")
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsMobileMenuOpen(false)
+      dispatch(clearUser())
+      router.push("/login")
+    }
+  }
+
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (!token) {
@@ -110,7 +122,7 @@ export default function MemberLayout({ children }) {
         <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
           <LayoutDashboard className="size-4" />Back to Website
         </Link>
-        <button onClick={() => { setIsMobileMenuOpen(false); dispatch(clearUser()); router.push("/login") }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
+        <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
           <LogOut className="size-4" />Logout
         </button>
       </div>

@@ -2,16 +2,21 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const compression = require("compression");
 const app = express();
 
 app.use(morgan("dev"));
+app.use(helmet({ crossOriginResourcePolicy: false })); // allow images to be loaded
+app.use(compression());
 app.use(
     cors({
         origin: ["https://realhumantrust.org", "https://www.realhumantrust.org", "http://localhost:3000", "http://localhost:5173", "http://localhost:8080"],
         credentials: true,
     })
 );
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Increased limit for potential image uploads directly as base64 or larger text data
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 const path = require("path");

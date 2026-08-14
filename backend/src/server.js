@@ -8,8 +8,13 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
     try {
         await connectDB();
-        await sequelize.sync();
-        console.log("Database synced successfully.");
+        if (process.env.NODE_ENV === 'production') {
+            await sequelize.sync();
+            console.log("Database checked successfully (Production mode - no auto-alter).");
+        } else {
+            await sequelize.sync({ alter: true });
+            console.log("Database synced successfully.");
+        }
 
         if (typeof (PhusionPassenger) !== "undefined") {
             app.listen("passenger");

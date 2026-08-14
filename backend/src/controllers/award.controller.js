@@ -43,7 +43,15 @@ exports.updateAward = async (req, res) => {
         const award = await Award.findByPk(req.params.id);
         if (!award) return res.status(404).json({ success: false, message: "Award not found" });
 
-        await award.update(req.body);
+        let image = award.image;
+        if (req.file) {
+            const uploadResult = await uploadOnCloudinary(req.file.path);
+            if (uploadResult) {
+                image = { public_id: uploadResult.public_id, url: uploadResult.url };
+            }
+        }
+
+        await award.update({ ...req.body, image });
         res.status(200).json({ success: true, award });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

@@ -40,7 +40,8 @@ export function AdminCrudPage({
   hideEdit,
   hideExport,
   crudRef,
-  onBeforeSubmit
+  onBeforeSubmit,
+  formatEditData
 }) {
   const crud = useCrud(endpoint)
   const { data, loading, error, createItem, updateItem, deleteItem } = crud
@@ -142,7 +143,7 @@ export function AdminCrudPage({
   }
 
   const handleEdit = (item) => {
-    setEditingItem(item)
+    setEditingItem(formatEditData ? formatEditData(item) : item)
     setModalOpen(true)
   }
 

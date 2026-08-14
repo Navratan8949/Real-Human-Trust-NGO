@@ -11,9 +11,9 @@ const getBaseUrl = () => {
     }
     
     if (typeof window !== "undefined" && window.location.hostname) {
-        return `http://${window.location.hostname}:5000/api/v1`;
+        return `http://${window.location.hostname}:5001/api/v1`;
     }
-    return "http://localhost:5000/api/v1";
+    return "http://localhost:5001/api/v1";
 };
 
 console.log('getBaseUrl:', getBaseUrl());

@@ -21,28 +21,6 @@ export default function Page() {
     { key: "certificateNo", label: "Certificate No." },
     { key: "issuedBy", label: "Issued By" },
     { key: "issueDate", label: "Issue Date", render: (r) => r.issueDate ? new Date(r.issueDate).toLocaleDateString() : "N/A" },    {
-      key: "actions",
-      label: "Actions",
-      render: (r) => (
-        <div className="flex gap-2">
-          {r.image?.url && (
-            <Button size="sm" variant="outline" asChild className="h-7 px-2">
-              <a href={getFileUrl(r.image.url)} target="_blank" rel="noopener noreferrer">
-                <Eye className="size-3.5 mr-1" /> View Image
-              </a>
-            </Button>
-          )}
-          {r.pdf?.url && (
-            <Button size="sm" variant="outline" asChild className="h-7 px-2">
-              <a href={getFileUrl(r.pdf.url)} target="_blank" rel="noopener noreferrer">
-                <Download className="size-3.5 mr-1" /> PDF
-              </a>
-            </Button>
-          )}
-        </div>
-      )
-    },
-    {
       key: "isActive",
       label: "Status",
       render: (r) => (
@@ -61,6 +39,24 @@ export default function Page() {
       schema={schema}
       columns={columns}
       primaryAction="Add Certificate"
+      customActions={(r) => (
+        <>
+          {r.image?.url && (
+            <Button size="sm" variant="outline" asChild className="h-7 px-2">
+              <a href={getFileUrl(r.image.url)} target="_blank" rel="noopener noreferrer">
+                <Eye className="size-3.5 mr-1" /> View Image
+              </a>
+            </Button>
+          )}
+          {r.pdf?.url && (
+            <Button size="sm" variant="outline" asChild className="h-7 px-2">
+              <a href={getFileUrl(r.pdf.url)} target="_blank" rel="noopener noreferrer">
+                <Download className="size-3.5 mr-1" /> PDF
+              </a>
+            </Button>
+          )}
+        </>
+      )}
     />
   )
 }

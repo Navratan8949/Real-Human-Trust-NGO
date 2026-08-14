@@ -7,9 +7,11 @@ import { useDispatch, useSelector } from "react-redux"
 import { selectUser, selectIsAuthenticated, selectAuthStatus, clearUser, fetchUser } from "@/redux/features/userSlice"
 import { cn } from "@/lib/utils"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import api from "@/service/api"
 
 const NAV = [
   { href: "/volunteer/dashboard", label: "My Profile", icon: UserCircle2, exact: true },
+  { href: "/volunteer/dashboard/id-card", label: "ID Card", icon: IdCard },
   { href: "/volunteer/dashboard/certificates", label: "Certificates", icon: FileBadge },
 ]
 
@@ -23,6 +25,18 @@ export default function VolunteerDashboardLayout({ children }) {
   const status = useSelector(selectAuthStatus)
   const [isChecking, setIsChecking] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  const handleLogout = async () => {
+    try {
+      await api.get("/auth/logout")
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsMobileMenuOpen(false)
+      dispatch(clearUser())
+      router.push("/volunteer/login")
+    }
+  }
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
@@ -79,7 +93,7 @@ export default function VolunteerDashboardLayout({ children }) {
         <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
           <LayoutDashboard className="size-4" />Back to Website
         </Link>
-        <button onClick={() => { setIsMobileMenuOpen(false); dispatch(clearUser()); localStorage.removeItem("token"); router.push("/volunteer/login") }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
+        <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
           <LogOut className="size-4" />Logout
         </button>
       </div>

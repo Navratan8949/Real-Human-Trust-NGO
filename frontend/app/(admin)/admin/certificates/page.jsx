@@ -94,6 +94,15 @@ export default function Page() {
       endpoint="/certificates"
       schema={certificateSchema}
       columns={columns}
+      formatEditData={(item) => {
+        const formatted = { ...item }
+        if (formatted.memberId) {
+          formatted.recipient = `member_${formatted.memberId}`
+        } else if (formatted.volunteerId) {
+          formatted.recipient = `volunteer_${formatted.volunteerId}`
+        }
+        return formatted
+      }}
       onBeforeSubmit={(data) => {
         // Parse the composite recipient value back into memberId or volunteerId
         const parsedData = { ...data }

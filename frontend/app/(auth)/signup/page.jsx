@@ -55,7 +55,6 @@ export default function SignupPage() {
       await dispatch(fetchUser()).unwrap();
 
       toast.success("Account created successfully!"); 
-      router.push("/") 
     } catch (err) { 
       toast.error(err?.response?.data?.message || err?.message || "Registration failed") 
     } finally { 
