@@ -19,7 +19,7 @@ export default function VolunteerIdCard() {
 
   const fetchProfile = async () => {
     try {
-      const res = await api.get("/volunteers/me")
+      const res = await api.get("/volunteers/me", { authRole: "volunteer" })
       setProfile(res.data.volunteer)
     } catch (err) {
       toast.error("Failed to load profile for ID card")

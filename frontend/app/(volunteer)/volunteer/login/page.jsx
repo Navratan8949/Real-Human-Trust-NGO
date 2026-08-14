@@ -1,12 +1,14 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Loader2, ArrowLeft } from "lucide-react"
 import { useDispatch } from "react-redux"
-import { fetchUser } from "@/redux/features/userSlice"
+import { fetchUser, setUser } from "@/redux/features/userSlice"
 import { loginVolunteer } from "@/service/volunteer.service"
+import { clearStoredSession } from "@/lib/auth-storage"
+import api from "@/service/api"
 
 export default function VolunteerLogin() {
   const router = useRouter()
@@ -20,6 +22,11 @@ export default function VolunteerLogin() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  useEffect(() => {
+    clearStoredSession()
+    api.get("/auth/logout", { skipAuth: true }).catch(() => {})
+  }, [])
+
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
 
   const handleSubmit = async (e) => {
@@ -29,7 +36,11 @@ export default function VolunteerLogin() {
     try {
       const res = await loginVolunteer(formData)
       if (res.success) {
-        dispatch(fetchUser())
+        dispatch(setUser({
+          user: res.user,
+          token: res.token,
+        }))
+        await dispatch(fetchUser("volunteer")).unwrap()
         router.push("/volunteer/dashboard")
       }
     } catch (err) {

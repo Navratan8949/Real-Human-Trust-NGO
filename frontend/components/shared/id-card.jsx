@@ -1,10 +1,12 @@
 import { QRCodeSVG } from "qrcode.react"
+import { getFileUrl } from "@/lib/utils"
 
 export function IdCard({ member, user, volunteer, verificationUrl }) {
   if (!member && !volunteer) return null
 
   const isVolunteer = !!volunteer
-  const profileImage = isVolunteer ? volunteer.profileImage?.url : (member?.profileImage?.url || user?.profileImage?.url)
+  const profileImageUrl = isVolunteer ? volunteer.profileImage?.url : (member?.profileImage?.url || user?.profileImage?.url)
+  const profileImage = getFileUrl(profileImageUrl)
   const fullName = isVolunteer ? volunteer.fullName : user?.fullName
   const initial = fullName?.[0] || "?"
   const idNumber = isVolunteer ? volunteer.volunteerId : member?.memberId

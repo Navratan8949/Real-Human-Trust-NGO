@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getStoredToken } from "@/lib/auth-storage";
 
 const getBaseUrl = () => {
     if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
@@ -26,11 +27,16 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         if (typeof window !== "undefined") {
-            const token = localStorage.getItem("token");
+            const expectedRole = config.authRole;
+            const token = getStoredToken(expectedRole);
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
+            } else if (expectedRole) {
+                delete config.headers.Authorization;
+                config.withCredentials = false;
             }
         }
+        delete config.authRole;
         return config;
     },
     (error) => {

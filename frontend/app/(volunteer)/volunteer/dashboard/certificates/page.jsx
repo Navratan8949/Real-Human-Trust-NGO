@@ -10,7 +10,7 @@ export default function VolunteerCertificatesPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getMyCertificates()
+    getMyCertificates("volunteer")
       .then(res => {
         if (res.success) {
           setCertificates(res.certificates || [])

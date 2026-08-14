@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import { useDispatch, useSelector } from "react-redux"
 import { setUser, selectIsAuthenticated, fetchUser, selectUser } from "@/redux/features/userSlice"
 import { useEffect } from "react"
+import { getStoredToken } from "@/lib/auth-storage"
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -31,7 +32,7 @@ export default function AdminLoginPage() {
       return
     }
     // Also check token in localStorage to see if we should fetch profile
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    const token = getStoredToken()
     if (token && !isAuthenticated) {
       dispatch(fetchUser())
     }

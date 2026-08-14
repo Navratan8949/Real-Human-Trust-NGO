@@ -15,6 +15,13 @@ import Image from "next/image"
 import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { IconPicker } from "@/components/ui/icon-picker"
 
+const getImageUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http") || url.startsWith("data:")) return url;
+  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1").replace("/api/v1", "");
+  return `${baseUrl}${url}`;
+};
+
 export default function SiteContentAdminPage() {
   const dispatch = useDispatch()
   const { data: siteContent, isLoading } = useSelector((state) => state.siteContent)
@@ -46,6 +53,8 @@ export default function SiteContentAdminPage() {
   const [donateDetails, setDonateDetails] = useState({
     bankName: "", accountName: "", accountNumber: "", ifscCode: "", upiId: "", qrImage: ""
   })
+
+  console.log('donateDetails', donateDetails)
 
   const [siteLogo, setSiteLogo] = useState({ title: "Website Logo", image: "", existingImage: "" })
   const [ngoCertificates, setNgoCertificates] = useState([])
@@ -201,7 +210,7 @@ export default function SiteContentAdminPage() {
       formData.append("file", file)
       const res = await api.post("/site-content/upload", formData, { headers: { "Content-Type": "multipart/form-data" } })
       callback(res.data.url)
-      toast.success("Image uploaded successfully!")
+      // toast.success("Image uploaded successfully!")
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to upload image")
     }
@@ -483,9 +492,13 @@ export default function SiteContentAdminPage() {
               <div>
                 <label className="text-sm font-semibold block mb-2">UPI QR Code Image</label>
                 <div className="flex gap-4 items-center">
-                  {donateDetails.qrImage && <Image src={donateDetails.qrImage} width={100} height={100} className="rounded-md border p-1" alt="QR" />}
+                  {donateDetails.qrImage && <Image src={getImageUrl(donateDetails.qrImage)} width={100} height={100} className="rounded-md border p-1" alt="QR" />}
                   <div>
-                    <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setDonateDetails({ ...donateDetails, qrImage: url }), "qr_image")} />
+                    <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, async (url) => {
+                      const updated = { ...donateDetails, qrImage: url };
+                      setDonateDetails(updated);
+                      await saveContent("donate_details", "Donate Details", updated);
+                    }, "qr_image")} />
                     {uploadingImage === "qr_image" && <Loader2 className="animate-spin h-5 w-5 text-accent mt-2" />}
                   </div>
                 </div>
@@ -509,9 +522,13 @@ export default function SiteContentAdminPage() {
               <div>
                 <label className="text-sm font-semibold block mb-2">Payment QR Code Image</label>
                 <div className="flex gap-4 items-center">
-                  {membershipPayment.qrImage && <Image src={membershipPayment.qrImage} width={100} height={100} className="rounded-md border p-1" alt="QR" />}
+                  {membershipPayment.qrImage && <Image src={getImageUrl(membershipPayment.qrImage)} width={100} height={100} className="rounded-md border p-1" alt="QR" />}
                   <div>
-                    <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setMembershipPayment({ ...membershipPayment, qrImage: url }), "membership_qr")} />
+                    <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, async (url) => {
+                      const updated = { ...membershipPayment, qrImage: url };
+                      setMembershipPayment(updated);
+                      await saveContent("membership_payment", "Membership Payment", updated);
+                    }, "membership_qr")} />
                     {uploadingImage === "membership_qr" && <Loader2 className="animate-spin h-5 w-5 text-accent mt-2" />}
                   </div>
                 </div>
@@ -718,7 +735,7 @@ export default function SiteContentAdminPage() {
                 <label className="text-sm font-semibold block mb-2">Current Logo</label>
                 {siteLogo.existingImage && (
                   <div className="mb-4">
-                    <Image src={siteLogo.existingImage} alt="Site Logo" width={120} height={120} className="rounded-md border object-contain" />
+                    <Image src={getImageUrl(siteLogo.existingImage)} alt="Site Logo" width={120} height={120} className="rounded-md border object-contain" />
                   </div>
                 )}
               </div>

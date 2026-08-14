@@ -15,8 +15,8 @@ router.post("/apply", isAuthenticated, upload.fields([
     { name: "paymentScreenshot", maxCount: 1 }
 ]), applyMembership);
 
-router.get("/me", isAuthenticated, getMyProfile);
-router.put("/me", isAuthenticated, upload.single("profileImage"), require("../controllers/member.controller").updateMemberProfile);
+router.get("/me", isAuthenticated, authorizeRoles(["member"]), getMyProfile);
+router.put("/me", isAuthenticated, authorizeRoles(["member"]), upload.single("profileImage"), require("../controllers/member.controller").updateMemberProfile);
 
 // Admin / Manager / Coordinator routes
 router.get("/", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager", "coordinator"]), getAllMembers);

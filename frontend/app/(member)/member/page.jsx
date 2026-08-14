@@ -19,7 +19,7 @@ export default function Page() {
         setLoading(true)
         // Fetch Member Status
         try {
-          const memberRes = await api.get("/members/me");
+          const memberRes = await api.get("/members/me", { authRole: "member" });
           setMember(memberRes.data?.member)
         } catch (e) {}
         
@@ -37,7 +37,7 @@ export default function Page() {
 
         // Fetch Certificates Count
         try {
-          const certRes = await api.get("/certificates/me");
+          const certRes = await api.get("/certificates/me", { authRole: "member" });
           setStats(s => ({ ...s, certificates: certRes.data?.certificates?.length || 0 }))
         } catch (e) {}
 

@@ -21,9 +21,9 @@ export const getCertificates = async (params) => {
 };
 
 // Get My Certificates (Member)
-export const getMyCertificates = async () => {
+export const getMyCertificates = async (role) => {
     try {
-        const response = await api.get("/certificates/me");
+        const response = await api.get("/certificates/me", { authRole: role });
         return response.data;
     } catch (error) {
         throw error;

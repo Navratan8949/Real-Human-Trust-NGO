@@ -11,6 +11,13 @@ const generateToken = (id) => {
     });
 };
 
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+};
+
 exports.applyVolunteer = async (req, res) => {
     try {
         const { fullName, email, mobile, address, message, password } = req.body;
@@ -90,11 +97,7 @@ exports.loginVolunteer = async (req, res) => {
 
         const token = generateToken(volunteer.id);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('token', token, cookieOptions);
 
         res.status(200).json({
             success: true,

@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getmyprofile } from "../../service/auth.service";
+import { clearStoredSession, setStoredSession } from "@/lib/auth-storage";
 
 const initialState = {
   user: null,
@@ -9,9 +10,9 @@ const initialState = {
 
 export const fetchUser = createAsyncThunk(
   "user/fetchUser",
-  async (_, { rejectWithValue }) => {
+  async (role, { rejectWithValue }) => {
     try {
-      const userData = await getmyprofile();
+      const userData = await getmyprofile(role);
       console.log("------User data fetched successfully-------:", userData);
       return userData;
     } catch (error) {
@@ -33,15 +34,20 @@ const userSlice = createSlice({
       state.token = action.payload.token || null;
       state.isAuthenticated = true;
       if (action.payload.token && typeof window !== "undefined") {
-        localStorage.setItem("token", action.payload.token);
+        setStoredSession({
+          token: action.payload.token,
+          user: state.user,
+          role: state.user?.role,
+        });
       }
     },
     clearUser: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.status = "idle";
       if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
+        clearStoredSession();
       }
     },
   },
@@ -52,7 +58,12 @@ const userSlice = createSlice({
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.user = action.payload.user || action.payload;
+        let fetchedUser = action.payload.user || action.payload.volunteer || action.payload;
+        // Hotfix for live server lacking role on volunteer
+        if (fetchedUser && !fetchedUser.role && fetchedUser.volunteerId) {
+            fetchedUser = { ...fetchedUser, role: "volunteer" };
+        }
+        state.user = fetchedUser;
         state.isAuthenticated = true;
       })
       .addCase(fetchUser.rejected, (state, action) => {
@@ -61,7 +72,7 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         if (typeof window !== "undefined") {
-            localStorage.removeItem("token");
+            clearStoredSession();
         }
       });
   },

@@ -10,7 +10,7 @@ export default function MemberCertificatesPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getMyCertificates()
+    getMyCertificates("member")
       .then(res => {
         if (res.success) {
           setCertificates(res.certificates || [])

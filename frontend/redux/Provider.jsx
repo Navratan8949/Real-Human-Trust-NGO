@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import store from "./Store"
 import { fetchUser } from "./features/userSlice"
 import { fetchSiteContent } from "./features/siteContentSlice"
+import { getStoredToken } from "@/lib/auth-storage"
 
 function AppInitializer({ children }) {
   const dispatch = useDispatch()
@@ -13,9 +14,11 @@ function AppInitializer({ children }) {
     dispatch(fetchSiteContent())
 
     // Fetch user if token exists
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    const pathname = typeof window !== "undefined" ? window.location.pathname : ""
+    const expectedRole = pathname.startsWith("/volunteer") ? "volunteer" : undefined
+    const token = getStoredToken(expectedRole)
     if (token) {
-      dispatch(fetchUser())
+      dispatch(fetchUser(expectedRole))
     }
   }, [dispatch])
 

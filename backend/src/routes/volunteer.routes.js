@@ -20,8 +20,8 @@ router.post("/apply", upload.single("profileImage"), applyVolunteer);
 router.post("/login", loginVolunteer);
 
 // Volunteer Protected routes
-router.get("/me", isAuthenticated, getMe);
-router.put("/me", isAuthenticated, upload.single("profileImage"), updateMe);
+router.get("/me", isAuthenticated, authorizeRoles(["volunteer"]), getMe);
+router.put("/me", isAuthenticated, authorizeRoles(["volunteer"]), upload.single("profileImage"), updateMe);
 
 // Admin / Manager / Coordinator routes
 router.get("/", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager", "coordinator"]), getAllVolunteers);

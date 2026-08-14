@@ -6,6 +6,7 @@ import { fetchUser, selectIsAuthenticated, selectUser, selectAuthStatus } from "
 import { Loader2 } from "lucide-react"
 import { ADMIN_NAV } from "@/components/admin/sidebar"
 import { canAccessAdminPath, getFirstAllowedAdminPath, isAdminRole } from "@/lib/admin-permissions"
+import { getStoredToken } from "@/lib/auth-storage"
 
 export function AdminAuthGuard({ children }) {
   const router = useRouter()
@@ -19,7 +20,7 @@ export function AdminAuthGuard({ children }) {
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    const token = getStoredToken()
 
     // If there's no token at all, redirect immediately
     if (!token) {

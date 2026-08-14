@@ -20,6 +20,7 @@ const NAV = [
 ]
 
 import api from "@/service/api"
+import { getStoredToken } from "@/lib/auth-storage"
 
 export default function MemberLayout({ children }) {
   const pathname = usePathname()
@@ -46,19 +47,19 @@ export default function MemberLayout({ children }) {
   }
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    const token = getStoredToken("member")
     if (!token) {
       router.replace("/login")
       return
     }
     if (token && !isAuthenticated && status !== "loading") {
-      dispatch(fetchUser())
+      dispatch(fetchUser("member"))
     }
   }, [dispatch, isAuthenticated, status, router])
 
   useEffect(() => {
     if (isAuthenticated) {
-      api.get("/members/me")
+      api.get("/members/me", { authRole: "member" })
         .then(res => setMemberInfo(res.data?.member))
         .catch(() => {})
     }
@@ -163,4 +164,3 @@ export default function MemberLayout({ children }) {
     </div>
   )
 }
-

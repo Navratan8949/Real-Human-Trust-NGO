@@ -1,4 +1,5 @@
 import api from "./api";
+import { setStoredSession } from "@/lib/auth-storage";
 
 // Create Volunteer
 export const createVolunteer = async (data) => {
@@ -67,8 +68,11 @@ export const loginVolunteer = async (data) => {
     try {
         const response = await api.post("/volunteers/login", data);
         if (response.data.token) {
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("user", JSON.stringify(response.data.user));
+            setStoredSession({
+                token: response.data.token,
+                user: response.data.user,
+                role: "volunteer",
+            });
         }
         return response.data;
     } catch (error) {

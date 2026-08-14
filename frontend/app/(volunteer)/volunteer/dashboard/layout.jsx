@@ -8,6 +8,7 @@ import { selectUser, selectIsAuthenticated, selectAuthStatus, clearUser, fetchUs
 import { cn } from "@/lib/utils"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import api from "@/service/api"
+import { getStoredToken } from "@/lib/auth-storage"
 
 const NAV = [
   { href: "/volunteer/dashboard", label: "My Profile", icon: UserCircle2, exact: true },
@@ -39,13 +40,13 @@ export default function VolunteerDashboardLayout({ children }) {
   }
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    const token = getStoredToken("volunteer")
     if (!token) {
       router.replace("/volunteer/login")
       return
     }
     if (token && !isAuthenticated && status !== "loading") {
-      dispatch(fetchUser())
+      dispatch(fetchUser("volunteer"))
     }
   }, [dispatch, isAuthenticated, status, router])
 

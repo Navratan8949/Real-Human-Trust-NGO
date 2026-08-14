@@ -15,7 +15,7 @@ export default function Page() {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const res = await api.get("/members/me")
+        const res = await api.get("/members/me", { authRole: "member" })
         setMember(res.data?.member)
       } catch (err) {
         // Normal if 404

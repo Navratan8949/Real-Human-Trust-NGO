@@ -29,7 +29,7 @@ export default function Page() {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const res = await api.get("/members/me")
+        const res = await api.get("/members/me", { authRole: "member" })
         setMember(res.data?.member)
       } catch (err) {
         // Normal if 404
@@ -68,6 +68,7 @@ export default function Page() {
       if (profileImage) form.append("profileImage", profileImage)
 
       const res = await api.put("/members/me", form, {
+        authRole: "member",
         headers: { "Content-Type": "multipart/form-data" }
       })
       

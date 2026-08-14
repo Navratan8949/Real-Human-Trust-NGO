@@ -5,19 +5,36 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs))
 }
 
+function getApiOrigin() {
+  const envApiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (envApiUrl) return envApiUrl.replace(/\/api\/v1\/?$/, "");
+
+  if (typeof window !== "undefined" && window.location.hostname) {
+    const hostname = window.location.hostname;
+    if (
+      hostname.includes("localhost") ||
+      hostname.includes("127.0.0.1") ||
+      hostname.startsWith("192.168.")
+    ) {
+      return `http://${hostname}:5001`;
+    }
+  }
+
+  return "https://realhumantrust.org";
+}
+
 export function getFileUrl(url) {
   if (!url) return url;
-  
-  // If it's already a relative path that doesn't start with http, keep it or prepend API base
-  // But wait, the goal is to fix localhost URLs.
-  if (url.includes('127.0.0.1:5000') || url.includes('localhost:5000')) {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://realhumantrust.org/api/v1";
-    // Usually API URL is something like https://realhumantrust.org/api/v1
-    // We want to replace the host with the base domain without /api/v1
-    const baseDomain = apiBase.replace('/api/v1', '');
-    return url.replace(/https?:\/\/(127\.0\.0\.1|localhost):5000/g, baseDomain);
+
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:") || url.startsWith("data:")) {
+    if (url.includes("127.0.0.1:5000") || url.includes("localhost:5000")) {
+      return url.replace(/https?:\/\/(127\.0\.0\.1|localhost):5000/g, getApiOrigin());
+    }
+    return url;
   }
-  return url;
+
+  const normalizedPath = url.startsWith("/") ? url : `/${url}`;
+  return `${getApiOrigin()}${normalizedPath}`;
 }
 
 export async function forceDownload(url, filename = 'download') {

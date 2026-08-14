@@ -6,7 +6,7 @@ const upload = require("../utils/multer");
 const { createCertificate, getAllCertificates, getMyCertificates, updateCertificate, deleteCertificate } = require("../controllers/certificate.controller");
 
 // Member routes
-router.get("/me", isAuthenticated, getMyCertificates);
+router.get("/me", isAuthenticated, authorizeRoles(["member", "volunteer"]), getMyCertificates);
 
 // Admin routes
 router.get("/", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager", "coordinator"]), getAllCertificates);

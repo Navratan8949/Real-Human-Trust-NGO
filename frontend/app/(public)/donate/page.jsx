@@ -449,7 +449,7 @@ export default function DonatePage() {
                 <div className="flex size-40 shrink-0 flex-col items-center justify-center rounded-2xl border border-border bg-white shadow-md text-center ring-4 ring-secondary/50 p-3">
                   {BANK.qrImage ? (
                     <div className="relative w-full h-full">
-                      <Image src={BANK.qrImage} alt="UPI QR Code" fill className="object-contain" />
+                      <Image src={BANK.qrImage.startsWith('http') ? BANK.qrImage : `${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1").replace("/api/v1", "")}${BANK.qrImage}`} alt="UPI QR Code" fill className="object-contain" />
                     </div>
                   ) : (
                     <QRCodeSVG

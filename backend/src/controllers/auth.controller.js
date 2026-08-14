@@ -4,10 +4,17 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { uploadOnCloudinary } = require("../utils/cloudinary");
 
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || 'secret123', {
+const generateToken = (id, role) => {
+    return jwt.sign({ id, role }, process.env.JWT_SECRET || 'secret123', {
         expiresIn: "30d",
     });
+};
+
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
 };
 
 exports.setupFirstAdmin = async (req, res) => {
@@ -96,13 +103,9 @@ exports.register = async (req, res) => {
             userType: userType || "",
         });
 
-        const token = generateToken(user.id);
+        const token = generateToken(user.id, user.role);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('token', token, cookieOptions);
 
         res.status(201).json({
             success: true,
@@ -155,13 +158,9 @@ exports.memberLogin = async (req, res) => {
         user.lastLogin = new Date();
         await user.save();
 
-        const token = generateToken(user.id);
+        const token = generateToken(user.id, user.role);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('token', token, cookieOptions);
 
         res.status(200).json({
             success: true,
@@ -214,13 +213,9 @@ exports.adminLogin = async (req, res) => {
         user.lastLogin = new Date();
         await user.save();
 
-        const token = generateToken(user.id);
+        const token = generateToken(user.id, user.role);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('token', token, cookieOptions);
 
         res.status(200).json({
             success: true,
@@ -266,6 +261,7 @@ exports.logout = async (req, res) => {
     res.clearCookie('token', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
     res.status(200).json({ success: true, message: "Logged out successfully" });
 };

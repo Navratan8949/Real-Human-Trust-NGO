@@ -18,9 +18,10 @@ export const memberLogin = async (mobile, password) => {
     }
 }
 
-export const getmyprofile = async () => {
+export const getmyprofile = async (role) => {
     try {
-        const response = await api.get("/auth/me");
+        const endpoint = role === "volunteer" ? "/volunteers/me" : "/auth/me";
+        const response = await api.get(endpoint, { authRole: role });
         return response.data;
     } catch (error) {
         throw error;

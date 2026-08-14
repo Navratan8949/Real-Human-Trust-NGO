@@ -9,6 +9,7 @@ import { Loader2, Camera, Download, Printer } from "lucide-react"
 import { toast } from "sonner"
 import api from "@/service/api"
 import { IdCard } from "@/components/shared/id-card"
+import { getFileUrl } from "@/lib/utils"
 
 export default function VolunteerDashboard() {
   const user = useSelector(selectUser)
@@ -25,7 +26,7 @@ export default function VolunteerDashboard() {
 
   const fetchProfile = async () => {
     try {
-      const res = await api.get("/volunteers/me")
+      const res = await api.get("/volunteers/me", { authRole: "volunteer" })
       setProfile(res.data.volunteer)
       setFormData({
         fullName: res.data.volunteer.fullName,
@@ -36,7 +37,7 @@ export default function VolunteerDashboard() {
         gender: res.data.volunteer.gender || "",
       })
       if (res.data.volunteer.profileImage?.url) {
-        setPreviewUrl(res.data.volunteer.profileImage.url)
+        setPreviewUrl(getFileUrl(res.data.volunteer.profileImage.url))
       }
     } catch (err) {
       toast.error("Failed to load profile")
@@ -47,11 +48,39 @@ export default function VolunteerDashboard() {
 
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
 
+  const saveProfileImage = async (file) => {
+    const formDataToSend = new FormData()
+    Object.keys(formData).forEach(key => {
+      formDataToSend.append(key, formData[key] ?? "")
+    })
+    formDataToSend.append("profileImage", file)
+
+    setSaving(true)
+    try {
+      const res = await api.put("/volunteers/me", formDataToSend, { authRole: "volunteer" })
+      const updatedVolunteer = res.data.volunteer
+      setProfile(updatedVolunteer)
+      setSelectedFile(null)
+      if (updatedVolunteer.profileImage?.url) {
+        setPreviewUrl(`${getFileUrl(updatedVolunteer.profileImage.url)}?v=${Date.now()}`)
+      }
+      toast.success("Profile image updated")
+    } catch (err) {
+      setPreviewUrl(profile?.profileImage?.url ? getFileUrl(profile.profileImage.url) : "")
+      toast.error(err.response?.data?.message || "Failed to update profile image")
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setSelectedFile(file)
-      setPreviewUrl(URL.createObjectURL(file))
+      const objectUrl = URL.createObjectURL(file)
+      setPreviewUrl(objectUrl)
+      saveProfileImage(file).finally(() => URL.revokeObjectURL(objectUrl))
+      e.target.value = ""
     }
   }
 
@@ -67,8 +96,12 @@ export default function VolunteerDashboard() {
         formDataToSend.append("profileImage", selectedFile)
       }
 
-      const res = await api.put("/volunteers/me", formDataToSend)
+      const res = await api.put("/volunteers/me", formDataToSend, { authRole: "volunteer" })
       setProfile(res.data.volunteer)
+      setSelectedFile(null)
+      if (res.data.volunteer.profileImage?.url) {
+        setPreviewUrl(getFileUrl(res.data.volunteer.profileImage.url))
+      }
       toast.success("Profile updated successfully")
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update profile")
@@ -95,8 +128,8 @@ export default function VolunteerDashboard() {
             )}
             <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/60 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
               <Camera className="size-8 text-white mb-2" />
-              <span className="absolute bottom-4 text-xs font-medium text-white">Change</span>
-              <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+              <span className="absolute bottom-4 text-xs font-medium text-white">{saving ? "Saving..." : "Change"}</span>
+              <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={saving} />
             </label>
           </div>
           
