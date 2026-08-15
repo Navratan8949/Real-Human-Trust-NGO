@@ -148,7 +148,10 @@ export function Footer() {
             <Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition">Terms & Conditions</Link>
           </div>
-          <p>Registered Charitable Trust · 80G &amp; 12A Certified</p>
+          <div className="flex flex-col items-center md:items-end gap-1">
+            <p>Registered Charitable Trust · 80G &amp; 12A Certified</p>
+            <p>Designed by <span className="text-white/60">ZDC Techglobal Pvt Ltd</span></p>
+          </div>
         </div>
       </div>
     </footer>
