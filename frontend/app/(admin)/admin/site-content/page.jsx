@@ -51,7 +51,7 @@ export default function SiteContentAdminPage() {
   })
 
   const [donateDetails, setDonateDetails] = useState({
-    bankName: "", accountName: "", accountNumber: "", ifscCode: "", upiId: "", qrImage: ""
+    bankName: "", accountName: "", accountNumber: "", ifscCode: "", upiId: "", qrImage: "", branchName: "", crnNo: ""
   })
 
   console.log('donateDetails', donateDetails)
@@ -484,8 +484,10 @@ export default function SiteContentAdminPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="text-sm font-semibold">Bank Name</label><Input value={donateDetails.bankName} onChange={e => setDonateDetails({ ...donateDetails, bankName: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">Branch Name</label><Input value={donateDetails.branchName} onChange={e => setDonateDetails({ ...donateDetails, branchName: e.target.value })} /></div>
                 <div><label className="text-sm font-semibold">Account Name</label><Input value={donateDetails.accountName} onChange={e => setDonateDetails({ ...donateDetails, accountName: e.target.value })} /></div>
                 <div><label className="text-sm font-semibold">Account Number</label><Input value={donateDetails.accountNumber} onChange={e => setDonateDetails({ ...donateDetails, accountNumber: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">CRN No</label><Input value={donateDetails.crnNo} onChange={e => setDonateDetails({ ...donateDetails, crnNo: e.target.value })} /></div>
                 <div><label className="text-sm font-semibold">IFSC Code</label><Input value={donateDetails.ifscCode} onChange={e => setDonateDetails({ ...donateDetails, ifscCode: e.target.value })} /></div>
                 <div><label className="text-sm font-semibold">UPI ID</label><Input value={donateDetails.upiId} onChange={e => setDonateDetails({ ...donateDetails, upiId: e.target.value })} /></div>
               </div>

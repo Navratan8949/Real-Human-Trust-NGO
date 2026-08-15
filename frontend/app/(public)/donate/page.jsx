@@ -343,6 +343,7 @@ export default function DonatePage() {
     ifsc: "SBIN0001234",
     bank: "State Bank of India",
     branch: "Rajkot Main Branch",
+    crnNo: "",
     upi: "realhumantrust@sbi",
     qrImage: ""
   }
@@ -350,7 +351,15 @@ export default function DonatePage() {
   if (siteContent?.donate_details?.content) {
     try {
       const parsed = JSON.parse(siteContent.donate_details.content)
-      BANK = { ...BANK, ...parsed, upi: parsed.upiId, ifsc: parsed.ifscCode }
+      BANK = { 
+        ...BANK, 
+        ...parsed, 
+        upi: parsed.upiId || parsed.upi, 
+        ifsc: parsed.ifscCode || parsed.ifsc,
+        bank: parsed.bankName || parsed.bank,
+        branch: parsed.branchName || parsed.branch,
+        crnNo: parsed.crnNo || BANK.crnNo
+      }
     } catch(e) {}
   }
 
@@ -486,10 +495,11 @@ export default function DonatePage() {
                 {[
                   ["Account Name", BANK.accountName],
                   ["Account Number", BANK.accountNumber],
+                  ["CRN No", BANK.crnNo],
                   ["IFSC Code", BANK.ifsc],
                   ["Bank", BANK.bank],
                   ["Branch", BANK.branch],
-                ].map(([label, value]) => (
+                ].filter(([label, value]) => value).map(([label, value]) => (
                   <div key={label} className="flex items-center justify-between border-b border-border/50 pb-3 last:border-0 last:pb-0">
                     <span className="font-medium text-muted-foreground">{label}</span>
                     <span className="flex items-center font-bold text-navy">
