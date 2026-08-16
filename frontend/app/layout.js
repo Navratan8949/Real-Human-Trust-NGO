@@ -123,9 +123,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className="font-sans antialiased">
         <ReduxProvider>
-          <SplashScreen>
-            {children}
-          </SplashScreen>
+          {children}
           <Toaster position="top-center" richColors />
         </ReduxProvider>
       </body>
