@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/fix-live-db", fixLiveDb);
 
-// Admin / Manager / Coordinator routes
+// Admin / Manager / Coordinator route's
 router.get("/stats", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager", "coordinator"]), getDashboardStats);
 
 module.exports = router;
