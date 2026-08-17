@@ -1,5 +1,28 @@
-const { Member, Donation, Project, Event, Complaint, Crowdfunding, Volunteer, User } = require("../models");
+const { Member, Donation, Project, Event, Complaint, Crowdfunding, Volunteer, User, sequelize } = require("../models");
 const { Op } = require("sequelize");
+
+exports.fixLiveDb = async (req, res) => {
+    try {
+        const [tables] = await sequelize.query("SHOW TABLES;");
+        let droppedCount = 0;
+        let logs = [];
+        for (let t of tables) {
+            const tableName = Object.values(t)[0];
+            const [indexes] = await sequelize.query(`SHOW INDEXES FROM ${tableName};`);
+            const indexNames = [...new Set(indexes.map(i => i.Key_name))];
+            for (let idx of indexNames) {
+                if (idx !== 'PRIMARY' && /\_\d+$/.test(idx)) {
+                    logs.push(`Dropping ${idx} from ${tableName}`);
+                    await sequelize.query(`ALTER TABLE ${tableName} DROP INDEX ${idx};`).catch(e => logs.push(`Error: ${e.message}`));
+                    droppedCount++;
+                }
+            }
+        }
+        res.status(200).json({ success: true, message: `Dropped ${droppedCount} duplicate indexes.`, logs });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 exports.getDashboardStats = async (req, res) => {
     try {
