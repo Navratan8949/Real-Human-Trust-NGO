@@ -1,5 +1,4 @@
 import { Toaster } from "@/components/ui/sonner"
-import { SplashScreen } from "@/components/splash-screen/splash-screen"
 import { ReduxProvider } from "@/redux/Provider"
 import "./globals.css"
 
